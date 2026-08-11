@@ -2,19 +2,22 @@ import { Platform } from 'react-native';
 import Constants from 'expo-constants';
 
 function resolveBaseUrl(): string {
-  const envUrl = process.env.EXPO_PUBLIC_API_URL;
+  let envUrl = process.env.EXPO_PUBLIC_API_URL?.trim();
 
-  // 1. If running on Web, localhost:8000 works directly
-  if (Platform.OS === 'web') {
-    return envUrl || 'http://localhost:8000/api/v1';
-  }
-
-  // 2. If explicit non-localhost IP provided in .env
-  if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+  if (envUrl) {
+    envUrl = envUrl.replace(/\/+$/, '');
+    if (!envUrl.endsWith('/api/v1')) {
+      envUrl = `${envUrl}/api/v1`;
+    }
     return envUrl;
   }
 
-  // 3. Automatically extract PC's Wi-Fi IP address from Expo Metro Bundler connection
+  // 1. If running on Web, localhost:8000 works directly
+  if (Platform.OS === 'web') {
+    return 'http://localhost:8000/api/v1';
+  }
+
+  // 2. Automatically extract PC's Wi-Fi IP address from Expo Metro Bundler connection
   const hostUri = Constants.expoConfig?.hostUri;
   if (hostUri) {
     const hostIp = hostUri.split(':')[0];
@@ -23,7 +26,7 @@ function resolveBaseUrl(): string {
     }
   }
 
-  // 4. Android Emulator loopback alias
+  // 3. Android Emulator loopback alias
   if (Platform.OS === 'android') {
     return 'http://10.0.2.2:8000/api/v1';
   }
