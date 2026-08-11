@@ -1,0 +1,155 @@
+[
+  {
+    "id": "cat_food",
+    "name": "Food & Dining",
+    "type": "expense",
+    "icon": "restaurant",
+    "colorToken": "#FF7A00",
+    "isDefault": true,
+    "isActive": true
+  },
+  {
+    "id": "cat_groceries",
+    "name": "Groceries",
+    "type": "expense",
+    "icon": "cart",
+    "colorToken": "#2E9B68",
+    "isDefault": true,
+    "isActive": true
+  },
+  {
+    "id": "cat_shopping",
+    "name": "Shopping",
+    "type": "expense",
+    "icon": "bag-handle",
+    "colorToken": "#8B5CF6",
+    "isDefault": true,
+    "isActive": true
+  },
+  {
+    "id": "cat_travel",
+    "name": "Travel & Commute",
+    "type": "expense",
+    "icon": "car",
+    "colorToken": "#3B82F6",
+    "isDefault": true,
+    "isActive": true
+  },
+  {
+    "id": "cat_bills",
+    "name": "Bills & Utilities",
+    "type": "expense",
+    "icon": "flash",
+    "colorToken": "#EF4444",
+    "isDefault": true,
+    "isActive": true
+  },
+  {
+    "id": "cat_entertain",
+    "name": "Entertainment",
+    "type": "expense",
+    "icon": "film",
+    "colorToken": "#EC4899",
+    "isDefault": true,
+    "isActive": true
+  },
+  {
+    "id": "cat_health",
+    "name": "Health & Medical",
+    "type": "expense",
+    "icon": "medkit",
+    "colorToken": "#10B981",
+    "isDefault": true,
+    "isActive": true
+  },
+  {
+    "id": "cat_education",
+    "name": "Education",
+    "type": "expense",
+    "icon": "school",
+    "colorToken": "#6366F1",
+    "isDefault": true,
+    "isActive": true
+  },
+  {
+    "id": "cat_rent",
+    "name": "Rent & Housing",
+    "type": "expense",
+    "icon": "home",
+    "colorToken": "#F59E0B",
+    "isDefault": true,
+    "isActive": true
+  },
+  {
+    "id": "cat_subs",
+    "name": "Subscriptions",
+    "type": "expense",
+    "icon": "tv",
+    "colorToken": "#06B6D4",
+    "isDefault": true,
+    "isActive": true
+  },
+  {
+    "id": "cat_personal",
+    "name": "Personal Care",
+    "type": "expense",
+    "icon": "sparkles",
+    "colorToken": "#14B8A6",
+    "isDefault": true,
+    "isActive": true
+  },
+  {
+    "id": "cat_other_exp",
+    "name": "Other Expense",
+    "type": "expense",
+    "icon": "ellipsis-horizontal-circle",
+    "colorToken": "#6B7280",
+    "isDefault": true,
+    "isActive": true
+  },
+  {
+    "id": "cat_salary",
+    "name": "Salary",
+    "type": "income",
+    "icon": "cash",
+    "colorToken": "#2E9B68",
+    "isDefault": true,
+    "isActive": true
+  },
+  {
+    "id": "cat_freelance",
+    "name": "Freelance",
+    "type": "income",
+    "icon": "laptop",
+    "colorToken": "#10B981",
+    "isDefault": true,
+    "isActive": true
+  },
+  {
+    "id": "cat_investment",
+    "name": "Investment Return",
+    "type": "income",
+    "icon": "trending-up",
+    "colorToken": "#3B82F6",
+    "isDefault": true,
+    "isActive": true
+  },
+  {
+    "id": "cat_gift",
+    "name": "Gifts & Rewards",
+    "type": "income",
+    "icon": "gift",
+    "colorToken": "#F43F5E",
+    "isDefault": true,
+    "isActive": true
+  },
+  {
+    "id": "cat_other_inc",
+    "name": "Other Income",
+    "type": "income",
+    "icon": "wallet",
+    "colorToken": "#6366F1",
+    "isDefault": true,
+    "isActive": true
+  }
+]

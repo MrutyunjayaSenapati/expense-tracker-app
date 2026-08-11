@@ -1,0 +1,11 @@
+[
+  {
+    "id": "user_001",
+    "name": "Mrutyunjaya Senapati",
+    "email": "mrutyunjaya.senapati@example.com",
+    "avatarUrl": null,
+    "currency": "INR",
+    "locale": "en-IN",
+    "createdAt": "2026-01-15T10:00:00.000Z"
+  }
+]

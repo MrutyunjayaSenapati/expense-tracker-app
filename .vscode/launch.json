@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Expo: Attach to Packager",
+      "type": "node",
+      "request": "attach",
+      "port": 8081,
+      "address": "localhost",
+      "restart": true,
+      "localRoot": "${workspaceFolder}",
+      "remoteRoot": "http://localhost:8081",
+      "skipFiles": ["<node_internals>/**", "**/node_modules/**"]
+    }
+  ]
+}

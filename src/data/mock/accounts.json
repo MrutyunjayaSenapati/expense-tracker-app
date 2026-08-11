@@ -1,0 +1,62 @@
+[
+  {
+    "id": "acc_hdfc",
+    "name": "HDFC Salary A/C",
+    "type": "bank",
+    "institutionName": "HDFC Bank",
+    "balance": 65400,
+    "currency": "INR",
+    "icon": "business",
+    "isActive": true,
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-08-10T08:00:00.000Z"
+  },
+  {
+    "id": "acc_upi",
+    "name": "Paytm UPI",
+    "type": "upi",
+    "institutionName": "Paytm Payments Bank",
+    "balance": 3450,
+    "currency": "INR",
+    "icon": "phone-portrait",
+    "isActive": true,
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-08-10T08:00:00.000Z"
+  },
+  {
+    "id": "acc_cash",
+    "name": "Wallet Cash",
+    "type": "cash",
+    "institutionName": "Cash in Hand",
+    "balance": 1800,
+    "currency": "INR",
+    "icon": "cash",
+    "isActive": true,
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-08-10T08:00:00.000Z"
+  },
+  {
+    "id": "acc_icici_credit",
+    "name": "ICICI Platinum Card",
+    "type": "credit_card",
+    "institutionName": "ICICI Bank",
+    "balance": -8200,
+    "currency": "INR",
+    "icon": "card",
+    "isActive": true,
+    "createdAt": "2026-01-01T00:00:00.000Z",
+    "updatedAt": "2026-08-10T08:00:00.000Z"
+  },
+  {
+    "id": "acc_zerodha",
+    "name": "Zerodha Fund A/C",
+    "type": "other",
+    "institutionName": "Zerodha",
+    "balance": 25000,
+    "currency": "INR",
+    "icon": "trending-up",
+    "isActive": true,
+    "createdAt": "2026-02-15T00:00:00.000Z",
+    "updatedAt": "2026-08-10T08:00:00.000Z"
+  }
+]
