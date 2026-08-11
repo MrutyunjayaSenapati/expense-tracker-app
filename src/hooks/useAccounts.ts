@@ -2,19 +2,25 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AccountType, CreateAccountInput, UpdateAccountInput } from '../types/account';
 import { accountRepository } from '../repositories';
 import { useAppStore } from '../store/useAppStore';
+import { useAuthStore } from '../store/useAuthStore';
 
 export function useAccounts(type?: AccountType) {
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+
   return useQuery({
     queryKey: ['accounts', type],
     queryFn: () => accountRepository.getAccounts(type),
+    enabled: isAuthenticated,
   });
 }
 
 export function useAccount(id?: string) {
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+
   return useQuery({
     queryKey: ['account', id],
     queryFn: () => (id ? accountRepository.getAccountById(id) : null),
-    enabled: !!id,
+    enabled: isAuthenticated && !!id,
   });
 }
 

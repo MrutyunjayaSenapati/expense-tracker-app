@@ -28,11 +28,10 @@ export class ApiUserRepository implements UserRepository {
         createdAt: data.created_at,
       };
     } catch {
-      // Fallback
       return {
-        id: 'user_fallback',
-        name: 'Demo User',
-        email: 'demo@expensetracker.app',
+        id: '',
+        name: 'User',
+        email: '',
         currency: this.localCurrency,
         locale: 'en-IN',
         createdAt: new Date().toISOString(),

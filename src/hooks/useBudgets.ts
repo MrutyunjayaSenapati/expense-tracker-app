@@ -2,19 +2,25 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { CreateBudgetInput, UpdateBudgetInput } from '../types/budget';
 import { budgetRepository } from '../repositories';
 import { useAppStore } from '../store/useAppStore';
+import { useAuthStore } from '../store/useAuthStore';
 
 export function useBudgets() {
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+
   return useQuery({
     queryKey: ['budgets'],
     queryFn: () => budgetRepository.getBudgets(),
+    enabled: isAuthenticated,
   });
 }
 
 export function useBudget(id?: string) {
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+
   return useQuery({
     queryKey: ['budget', id],
     queryFn: () => (id ? budgetRepository.getBudgetById(id) : null),
-    enabled: !!id,
+    enabled: isAuthenticated && !!id,
   });
 }
 

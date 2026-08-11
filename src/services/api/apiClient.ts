@@ -1,5 +1,6 @@
 import { Platform } from 'react-native';
 import Constants from 'expo-constants';
+import * as SecureStore from 'expo-secure-store';
 
 function resolveBaseUrl(): string {
   let envUrl = process.env.EXPO_PUBLIC_API_URL?.trim();
@@ -54,6 +55,8 @@ interface AuthTokens {
   expiresAt: number;
 }
 
+const STORAGE_KEY = 'expense_tracker_tokens';
+
 class ApiClient {
   private baseUrl: string;
   private tokens: AuthTokens | null = null;
@@ -74,25 +77,40 @@ class ApiClient {
 
   private loadTokensFromStorage() {
     try {
-      if (Platform.OS === 'web' && typeof window !== 'undefined' && window.localStorage) {
-        const stored = window.localStorage.getItem('expense_tracker_tokens');
+      if (Platform.OS === 'web') {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          const stored = window.localStorage.getItem(STORAGE_KEY);
+          if (stored) {
+            this.tokens = JSON.parse(stored);
+          }
+        }
+      } else {
+        const stored = SecureStore.getItemSync(STORAGE_KEY);
         if (stored) {
           this.tokens = JSON.parse(stored);
         }
       }
     } catch {
-      // Ignored in non-browser envs
+      // Ignored
     }
   }
 
   private saveTokensToStorage(tokens: AuthTokens | null) {
     this.tokens = tokens;
     try {
-      if (Platform.OS === 'web' && typeof window !== 'undefined' && window.localStorage) {
+      if (Platform.OS === 'web') {
+        if (typeof window !== 'undefined' && window.localStorage) {
+          if (tokens) {
+            window.localStorage.setItem(STORAGE_KEY, JSON.stringify(tokens));
+          } else {
+            window.localStorage.removeItem(STORAGE_KEY);
+          }
+        }
+      } else {
         if (tokens) {
-          window.localStorage.setItem('expense_tracker_tokens', JSON.stringify(tokens));
+          SecureStore.setItemSync(STORAGE_KEY, JSON.stringify(tokens));
         } else {
-          window.localStorage.removeItem('expense_tracker_tokens');
+          SecureStore.deleteItemAsync(STORAGE_KEY).catch(() => {});
         }
       }
     } catch {
@@ -218,63 +236,6 @@ class ApiClient {
     } catch (e) {
       this.saveTokensToStorage(null);
       throw e;
-    }
-  }
-
-  private async loginOrRegisterDefaultUser(): Promise<void> {
-    const email = 'demo@expensetracker.app';
-    const password = 'Password123!';
-
-    try {
-      // Try login first
-      const loginRes = await fetch(`${this.baseUrl}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (loginRes.ok) {
-        const data = await loginRes.json();
-        this.saveTokensToStorage({
-          accessToken: data.access_token,
-          refreshToken: data.refresh_token,
-          expiresAt: Date.now() + data.expires_in * 1000,
-        });
-        return;
-      }
-
-      // If login failed, try registering
-      const regRes = await fetch(`${this.baseUrl}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: 'Demo User',
-          email,
-          password,
-          confirm_password: password,
-        }),
-      });
-
-      if (regRes.ok || regRes.status === 409) {
-        // Now login
-        const loginRes2 = await fetch(`${this.baseUrl}/auth/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password }),
-        });
-
-        if (loginRes2.ok) {
-          const data2 = await loginRes2.json();
-          this.saveTokensToStorage({
-            accessToken: data2.access_token,
-            refreshToken: data2.refresh_token,
-            expiresAt: Date.now() + data2.expires_in * 1000,
-          });
-          return;
-        }
-      }
-    } catch (err) {
-      console.warn('Backend connection issue, will retry:', err);
     }
   }
 

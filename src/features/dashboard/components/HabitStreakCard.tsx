@@ -9,70 +9,93 @@ import { Ionicons } from '@expo/vector-icons';
 
 export interface HabitStreakCardProps {
   streakDays?: number;
-  savedAmount?: number;
+  netSavings?: number;
 }
 
 export const HabitStreakCard: React.FC<HabitStreakCardProps> = ({
-  streakDays = 7,
-  savedAmount = 2400,
+  streakDays = 0,
+  netSavings = 0,
 }) => {
   const { colors } = useTheme();
 
   const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  const hasStreak = streakDays > 0;
+  const hasSavings = netSavings > 0;
 
   return (
     <View style={styles.container}>
-      {/* 7 Day Streak Card */}
+      {/* 1. Real Streak Card */}
       <Card variant="solid" elevation="sm" style={styles.streakCard}>
         <View style={styles.headerRow}>
-          <Text variant="headingS" weight="bold">
+          <Text variant="body" weight="bold">
             {`${streakDays} Day Streak! 🔥`}
           </Text>
         </View>
-        <Text variant="caption" color="secondary" style={styles.subtitle}>
-          {"You're building a great habit"}
+        <Text variant="caption" color="secondary" style={styles.subtitle} numberOfLines={1}>
+          {hasStreak ? 'Building a great habit' : 'Log a transaction today'}
         </Text>
 
-        {/* Days Bubbles */}
+        {/* Dynamic Days Bubbles (only active if streak > 0) */}
         <View style={styles.daysRow}>
-          {days.map((day, i) => (
-            <View
-              key={i}
-              style={[
-                styles.dayBubble,
-                { backgroundColor: i < streakDays ? colors.income : colors.surfaceMuted },
-              ]}
-            >
-              <Text
-                variant="caption"
-                weight="bold"
-                style={{
-                  color: i < streakDays ? colors.textInverse : colors.textTertiary,
-                  fontSize: 10,
-                }}
+          {days.map((day, i) => {
+            const isActive = i < Math.min(streakDays, 7);
+            return (
+              <View
+                key={i}
+                style={[
+                  styles.dayBubble,
+                  { backgroundColor: isActive ? colors.income : colors.surfaceMuted },
+                ]}
               >
-                {day}
-              </Text>
-            </View>
-          ))}
+                <Text
+                  variant="caption"
+                  weight="bold"
+                  style={{
+                    color: isActive ? colors.textInverse : colors.textTertiary,
+                    fontSize: 9,
+                  }}
+                >
+                  {day}
+                </Text>
+              </View>
+            );
+          })}
         </View>
       </Card>
 
-      {/* Budget Achieved Card */}
+      {/* 2. Real Savings Card */}
       <Card variant="solid" elevation="sm" style={styles.achievementCard}>
         <View style={styles.headerRow}>
-          <Text variant="headingS" weight="bold">
-            Budget Achieved! 🏆
+          <Text variant="body" weight="bold">
+            {hasSavings ? 'Monthly Savings 🏆' : 'Savings Goal 🎯'}
           </Text>
         </View>
-        <Text variant="caption" color="secondary" style={styles.subtitle}>
-          You stayed under budget
+        <Text variant="caption" color="secondary" style={styles.subtitle} numberOfLines={1}>
+          {hasSavings ? 'Stayed under budget' : 'Track spending to save'}
         </Text>
 
-        <View style={[styles.savedBadge, { backgroundColor: colors.incomeSoft }]}>
-          <Ionicons name="sparkles" size={14} color={colors.income} />
-          <Text variant="caption" weight="bold" color="income">
-            {`Saved ₹${savedAmount.toLocaleString('en-IN')}`}
+        <View
+          style={[
+            styles.savedBadge,
+            { backgroundColor: hasSavings ? colors.incomeSoft : colors.surfaceMuted },
+          ]}
+        >
+          <Ionicons
+            name={hasSavings ? 'sparkles' : 'wallet-outline'}
+            size={12}
+            color={hasSavings ? colors.income : colors.textSecondary}
+          />
+          <Text
+            variant="caption"
+            weight="bold"
+            style={{
+              color: hasSavings ? colors.income : colors.textSecondary,
+              fontSize: 11,
+            }}
+          >
+            {hasSavings
+              ? `Saved ₹${netSavings.toLocaleString('en-IN')}`
+              : '₹0 Saved this month'}
           </Text>
         </View>
       </Card>
@@ -83,16 +106,18 @@ export const HabitStreakCard: React.FC<HabitStreakCardProps> = ({
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    gap: spacing.md,
-    marginBottom: spacing.lg,
+    gap: spacing.sm,
+    marginBottom: spacing.md,
   },
   streakCard: {
     flex: 1,
-    padding: spacing.md,
+    padding: spacing.sm + 2,
+    justifyContent: 'space-between',
   },
   achievementCard: {
     flex: 1,
-    padding: spacing.md,
+    padding: spacing.sm + 2,
+    justifyContent: 'space-between',
   },
   headerRow: {
     flexDirection: 'row',
@@ -100,18 +125,19 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   subtitle: {
-    marginBottom: spacing.md,
-    fontSize: 11,
+    marginBottom: spacing.sm,
+    fontSize: 10.5,
   },
   daysRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    width: '100%',
   },
   dayBubble: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -119,9 +145,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
     borderRadius: radius.full,
-    gap: 4,
+    gap: 3,
   },
 });
+
+

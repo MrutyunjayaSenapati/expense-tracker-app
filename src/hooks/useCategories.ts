@@ -2,19 +2,25 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { CategoryType, CreateCategoryInput, UpdateCategoryInput } from '../types/category';
 import { categoryRepository } from '../repositories';
 import { useAppStore } from '../store/useAppStore';
+import { useAuthStore } from '../store/useAuthStore';
 
 export function useCategories(type?: CategoryType) {
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+
   return useQuery({
     queryKey: ['categories', type],
     queryFn: () => categoryRepository.getCategories(type),
+    enabled: isAuthenticated,
   });
 }
 
 export function useCategory(id?: string) {
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+
   return useQuery({
     queryKey: ['category', id],
     queryFn: () => (id ? categoryRepository.getCategoryById(id) : null),
-    enabled: !!id,
+    enabled: isAuthenticated && !!id,
   });
 }
 

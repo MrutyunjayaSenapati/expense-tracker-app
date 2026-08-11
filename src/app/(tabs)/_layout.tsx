@@ -24,9 +24,9 @@ export default function TabLayout() {
           backgroundColor: Platform.OS === 'ios' ? colors.glassSurface : colors.surface,
           borderTopColor: colors.border,
           borderTopWidth: 1,
-          height: Platform.OS === 'ios' ? 88 : 68,
-          paddingBottom: Platform.OS === 'ios' ? 28 : 12,
-          paddingTop: 8,
+          height: Platform.OS === 'ios' ? 84 : 64,
+          paddingBottom: Platform.OS === 'ios' ? 24 : 8,
+          paddingTop: 6,
           ...shadows.glass,
         },
         tabBarBackground: () =>
@@ -38,8 +38,9 @@ export default function TabLayout() {
             />
           ) : null,
         tabBarLabelStyle: {
-          fontSize: 11,
+          fontSize: 10,
           fontWeight: '600',
+          marginBottom: 2,
         },
         headerStyle: {
           backgroundColor: colors.surface,
@@ -61,23 +62,23 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'home' : 'home-outline'}
-              size={22}
+              size={20}
               color={color}
             />
           ),
         }}
       />
 
-      {/* Transactions Tab */}
+      {/* Activity / Transactions Tab */}
       <Tabs.Screen
         name="transactions"
         options={{
-          title: 'Transactions',
+          title: 'Activity',
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'receipt' : 'receipt-outline'}
-              size={22}
+              size={20}
               color={color}
             />
           ),
@@ -98,8 +99,17 @@ export default function TabLayout() {
               accessibilityRole="button"
               accessibilityLabel="Add new transaction"
             >
-              <View style={[styles.addButton, { backgroundColor: colors.primary, borderColor: colors.surface, shadowColor: colors.primary }]}>
-                <Ionicons name="add" size={28} color="#FFFFFF" />
+              <View
+                style={[
+                  styles.addButton,
+                  {
+                    backgroundColor: colors.primary,
+                    borderColor: colors.surface,
+                    shadowColor: colors.primary,
+                  },
+                ]}
+              >
+                <Ionicons name="add" size={26} color="#FFFFFF" />
               </View>
             </AnimatedPressable>
           ),
@@ -115,7 +125,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'pie-chart' : 'pie-chart-outline'}
-              size={22}
+              size={20}
               color={color}
             />
           ),
@@ -131,7 +141,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'settings' : 'settings-outline'}
-              size={22}
+              size={20}
               color={color}
             />
           ),
@@ -143,20 +153,21 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   addButtonContainer: {
-    top: -18,
+    top: -14,
     justifyContent: 'center',
     alignItems: 'center',
   },
   addButton: {
-    width: 54,
-    height: 54,
-    borderRadius: 27,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.38,
-    shadowRadius: 10,
-    elevation: 8,
-    borderWidth: 3.5,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 6,
+    borderWidth: 3,
   },
 });
+

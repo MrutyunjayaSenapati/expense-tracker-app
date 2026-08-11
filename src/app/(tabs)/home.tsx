@@ -78,6 +78,7 @@ export default function HomeScreen() {
         <Animated.View entering={FadeInDown.duration(400).delay(50)}>
           <DashboardHeader
             user={user}
+            streakDays={dashboard.streakDays}
             onProfilePress={() => router.push('/(tabs)/settings')}
           />
         </Animated.View>
@@ -98,6 +99,9 @@ export default function HomeScreen() {
             totalIncome={dashboard.totalIncome}
             totalExpense={dashboard.totalExpense}
             netSavings={dashboard.netSavings}
+            savingsRate={dashboard.savingsRate}
+            incomeCount={dashboard.incomeCount}
+            expenseCount={dashboard.expenseCount}
           />
         </Animated.View>
 
@@ -121,7 +125,10 @@ export default function HomeScreen() {
 
         {/* Gamification & Habit Badges */}
         <Animated.View entering={FadeInDown.duration(450).delay(300)}>
-          <HabitStreakCard streakDays={7} savedAmount={2400} />
+          <HabitStreakCard
+            streakDays={dashboard.streakDays}
+            netSavings={dashboard.netSavings}
+          />
         </Animated.View>
 
         {/* Recent Transactions */}

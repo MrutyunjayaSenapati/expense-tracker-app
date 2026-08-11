@@ -4,6 +4,7 @@ import {
   categoryRepository,
   accountRepository,
 } from '../repositories';
+import { useAuthStore } from '../store/useAuthStore';
 import {
   ReportPeriod,
   ReportSummary,
@@ -26,8 +27,11 @@ export interface ReportDataResult {
 }
 
 export function useReportData(period: ReportPeriod = 'month') {
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+
   return useQuery({
     queryKey: ['reports', period],
+    enabled: isAuthenticated,
     queryFn: async (): Promise<ReportDataResult> => {
       const [allTransactions, categories, accounts] = await Promise.all([
         transactionRepository.getTransactions(undefined, 'date_desc'),

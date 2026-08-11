@@ -11,22 +11,28 @@ import {
   budgetRepository,
 } from '../repositories';
 import { useAppStore } from '../store/useAppStore';
+import { useAuthStore } from '../store/useAuthStore';
 
 export function useTransactions(
   filters?: TransactionFilters,
   sort: TransactionSort = 'date_desc'
 ) {
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+
   return useQuery({
     queryKey: ['transactions', filters, sort],
     queryFn: () => transactionRepository.getTransactions(filters, sort),
+    enabled: isAuthenticated,
   });
 }
 
 export function useTransaction(id?: string) {
+  const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+
   return useQuery({
     queryKey: ['transaction', id],
     queryFn: () => (id ? transactionRepository.getTransactionById(id) : null),
-    enabled: !!id,
+    enabled: isAuthenticated && !!id,
   });
 }
 
@@ -43,7 +49,7 @@ export function useCreateTransaction() {
       try {
         await accountRepository.updateBalance(input.accountId, delta);
       } catch {
-        // Account may not exist in mock, ignore error gracefully
+        // Balance is updated automatically by backend database trigger
       }
 
       // If expense, adjust budget spent

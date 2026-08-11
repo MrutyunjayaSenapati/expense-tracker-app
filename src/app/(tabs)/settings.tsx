@@ -27,9 +27,7 @@ export default function SettingsScreen() {
   const updateCurrencyMutation = useUpdateCurrency();
 
   const [currencySheetVisible, setCurrencySheetVisible] = useState(false);
-  const [resetModalVisible, setResetModalVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
-  const [isResetting, setIsResetting] = useState(false);
 
   const currentCurrency = user?.currency || 'INR';
 
@@ -41,19 +39,6 @@ export default function SettingsScreen() {
   const handleLogout = async () => {
     setLogoutModalVisible(false);
     await logout();
-  };
-
-  const handleResyncData = async () => {
-    setIsResetting(true);
-    try {
-      await queryClient.invalidateQueries();
-      setResetModalVisible(false);
-      showToast('Data refreshed and re-synced from backend', 'success');
-    } catch {
-      showToast('Failed to re-sync data', 'error');
-    } finally {
-      setIsResetting(false);
-    }
   };
 
   return (
@@ -206,70 +191,11 @@ export default function SettingsScreen() {
         </TouchableOpacity>
       </Card>
 
-      {/* Backend & Sync Section */}
-      <Text variant="label" color="secondary" style={styles.sectionHeader}>
-        BACKEND & SYNC
-      </Text>
-      <Card elevation="none" style={styles.menuCard}>
-        <View style={styles.menuItem}>
-          <View style={styles.menuLeft}>
-            <View style={[styles.menuIcon, { backgroundColor: colors.incomeSoft }]}>
-              <Ionicons name="server-outline" size={20} color={colors.income} />
-            </View>
-            <View>
-              <Text variant="bodyLarge" weight="semibold">
-                FastAPI Backend
-              </Text>
-              <Text variant="caption" color="secondary">
-                Connected to http://localhost:8000/api/v1
-              </Text>
-            </View>
-          </View>
-          <Ionicons name="checkmark-circle" size={20} color={colors.income} />
-        </View>
-
-        <View style={[styles.divider, { backgroundColor: colors.border }]} />
-
-        <TouchableOpacity
-          onPress={() => setResetModalVisible(true)}
-          activeOpacity={0.7}
-          style={styles.menuItem}
-        >
-          <View style={styles.menuLeft}>
-            <View style={[styles.menuIcon, { backgroundColor: colors.primaryLight }]}>
-              <Ionicons name="sync-outline" size={20} color={colors.primary} />
-            </View>
-            <Text variant="bodyLarge" weight="semibold" color="brand">
-              Re-sync Backend Data
-            </Text>
-          </View>
-          <Ionicons name="chevron-forward" size={18} color={colors.textTertiary} />
-        </TouchableOpacity>
-      </Card>
-
       {/* Account Actions Section */}
       <Text variant="label" color="secondary" style={styles.sectionHeader}>
         ACCOUNT
       </Text>
       <Card elevation="none" style={styles.menuCard}>
-        <TouchableOpacity
-          onPress={() => router.push('/auth/login')}
-          activeOpacity={0.7}
-          style={styles.menuItem}
-        >
-          <View style={styles.menuLeft}>
-            <View style={[styles.menuIcon, { backgroundColor: colors.primaryLight }]}>
-              <Ionicons name="swap-horizontal-outline" size={20} color={colors.primary} />
-            </View>
-            <Text variant="bodyLarge" weight="semibold">
-              Switch / Sign In with Another Account
-            </Text>
-          </View>
-          <Ionicons name="chevron-forward" size={18} color={colors.textTertiary} />
-        </TouchableOpacity>
-
-        <View style={[styles.divider, { backgroundColor: colors.border }]} />
-
         <TouchableOpacity
           onPress={() => setLogoutModalVisible(true)}
           activeOpacity={0.7}
@@ -290,10 +216,7 @@ export default function SettingsScreen() {
       {/* App Version Info */}
       <View style={styles.appInfo}>
         <Text variant="caption" color="tertiary" align="center">
-          Expense Tracker v1.0.0 (FastAPI + React Native Connected)
-        </Text>
-        <Text variant="caption" color="disabled" align="center">
-          Full Stack Architecture · PostgreSQL / SQLite Backend
+          Expense Tracker v1.0.0
         </Text>
       </View>
 
@@ -339,19 +262,6 @@ export default function SettingsScreen() {
           })}
         </View>
       </BottomSheet>
-
-      {/* Reset Confirmation Modal */}
-      <ConfirmationModal
-        visible={resetModalVisible}
-        title="Re-sync with Backend?"
-        message="This will re-fetch all active accounts, categories, transactions, and budgets from the live backend server."
-        confirmLabel="Re-sync Data"
-        cancelLabel="Cancel"
-        isDestructive={false}
-        loading={isResetting}
-        onConfirm={handleResyncData}
-        onCancel={() => setResetModalVisible(false)}
-      />
 
       {/* Logout Confirmation Modal */}
       <ConfirmationModal
@@ -445,6 +355,33 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     marginLeft: 68,
+  },
+  syncInfoCol: {
+    flex: 1,
+    paddingRight: spacing.xs,
+  },
+  syncSubtitle: {
+    fontSize: 11,
+    marginTop: 1,
+  },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(52, 211, 153, 0.15)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: radius.full,
+    gap: 4,
+  },
+  onlineDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#10B981',
+  },
+  onlineText: {
+    color: '#059669',
+    fontSize: 11,
   },
   appInfo: {
     marginTop: spacing.md,

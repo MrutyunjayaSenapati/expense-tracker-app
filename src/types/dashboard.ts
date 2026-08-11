@@ -7,6 +7,11 @@ export interface DashboardSummary {
   totalIncome: number;
   totalExpense: number;
   netSavings: number;
+  savingsRate: number;
+  streakDays: number;
+  longestStreak: number;
+  incomeCount: number;
+  expenseCount: number;
   monthlyBudget: number;
   monthlyBudgetSpent: number;
   budgetStatus: 'healthy' | 'warning' | 'exceeded';
@@ -14,3 +19,4 @@ export interface DashboardSummary {
   categorySpending: CategorySpending[];
   topBudgets: Budget[];
 }
+

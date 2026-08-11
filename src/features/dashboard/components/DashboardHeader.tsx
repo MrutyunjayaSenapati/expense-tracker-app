@@ -11,43 +11,42 @@ import { User } from '../../../types/user';
 
 export interface DashboardHeaderProps {
   user?: User | null;
+  streakDays?: number;
   onProfilePress?: () => void;
   onNotificationPress?: () => void;
 }
 
 export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   user,
+  streakDays = 0,
   onProfilePress,
   onNotificationPress,
 }) => {
   const { colors } = useTheme();
   const greeting = getGreeting();
-  const userName = user?.name ? user.name.split(' ')[0] : 'Mrutyunjaya';
+  const userName = user?.name?.trim() ? user.name.trim() : 'Friend';
   const currentMonth = formatMonthYear();
 
   return (
     <View style={styles.container}>
-      <View>
-        <Text variant="headingL" weight="bold">
-          {`${greeting},`}
+      <View style={styles.leftCol}>
+        <Text variant="caption" color="secondary" style={styles.greetingText}>
+          {greeting}
         </Text>
-        <View style={styles.nameRow}>
-          <Text variant="headingL" weight="bold">
-            {userName}
-          </Text>
-          <Text variant="headingL"> 👋</Text>
-        </View>
-        <Text variant="bodySmall" color="secondary" style={styles.dateText}>
+        <Text variant="headingL" weight="bold" numberOfLines={1} style={styles.nameText}>
+          {`${userName} 👋`}
+        </Text>
+        <Text variant="caption" color="secondary" style={styles.dateText}>
           {currentMonth}
         </Text>
       </View>
 
       <View style={styles.rightGroup}>
-        {/* Habit Tracking Streak Pill */}
+        {/* Real Streak Pill from Backend */}
         <View style={[styles.streakPill, { backgroundColor: colors.streakSoft }]}>
-          <Ionicons name="flame" size={15} color={colors.streakOrange} />
+          <Ionicons name="flame" size={13} color={colors.streakOrange} />
           <Text variant="caption" weight="bold" style={{ color: colors.streakOrange, fontSize: 11 }}>
-            7 day streak
+            {`${streakDays}d streak`}
           </Text>
         </View>
 
@@ -58,7 +57,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           style={[styles.iconButton, { backgroundColor: colors.surfaceMuted }]}
           accessibilityLabel="Notifications"
         >
-          <Ionicons name="notifications-outline" size={18} color={colors.textPrimary} />
+          <Ionicons name="notifications-outline" size={17} color={colors.textPrimary} />
           <View style={[styles.badgeDot, { backgroundColor: colors.expense }]} />
         </TouchableOpacity>
 
@@ -70,7 +69,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           accessibilityLabel="Go to Profile and Settings"
           style={[styles.avatar, { borderColor: colors.primary, backgroundColor: colors.primaryLight }]}
         >
-          <Ionicons name="person" size={18} color={colors.primary} />
+          <Ionicons name="person" size={16} color={colors.primary} />
         </AnimatedPressable>
       </View>
     </View>
@@ -82,33 +81,42 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.xs,
     marginBottom: spacing.xs,
   },
-  nameRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  leftCol: {
+    flex: 1,
+    paddingRight: spacing.xs,
+  },
+  greetingText: {
+    fontSize: 12,
+    marginBottom: 1,
+  },
+  nameText: {
+    fontSize: 22,
+    lineHeight: 26,
   },
   dateText: {
     marginTop: 2,
+    fontSize: 11,
   },
   rightGroup: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm - 2,
+    gap: 6,
   },
   streakPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: spacing.sm + 2,
-    paddingVertical: 5,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
     borderRadius: radius.full,
-    gap: 4,
+    gap: 3,
   },
   iconButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
@@ -118,15 +126,17 @@ const styles = StyleSheet.create({
     height: 6,
     borderRadius: 3,
     position: 'absolute',
-    top: 7,
-    right: 8,
+    top: 6,
+    right: 7,
   },
   avatar: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1.5,
   },
 });
+
+
