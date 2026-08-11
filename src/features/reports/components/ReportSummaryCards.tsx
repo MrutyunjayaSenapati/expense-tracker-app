@@ -73,10 +73,20 @@ export const ReportSummaryCards: React.FC<ReportSummaryCardsProps> = ({ summary 
             { backgroundColor: colors.surface, borderColor: colors.border, borderLeftColor: colors.income },
           ]}
         >
-          <Text variant="caption" weight="medium" color="secondary">
-            Total Income
-          </Text>
-          <Text variant="headingM" weight="bold" color="income">
+          <View style={styles.subCardHeader}>
+            <Text variant="caption" weight="medium" color="secondary">
+              Total Income
+            </Text>
+            <Ionicons name="arrow-down-circle" size={16} color={colors.income} />
+          </View>
+          <Text
+            variant="headingM"
+            weight="bold"
+            color="income"
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            style={styles.subCardAmount}
+          >
             {formatCurrency(summary.totalIncome)}
           </Text>
         </View>
@@ -88,10 +98,20 @@ export const ReportSummaryCards: React.FC<ReportSummaryCardsProps> = ({ summary 
             { backgroundColor: colors.surface, borderColor: colors.border, borderLeftColor: colors.expense },
           ]}
         >
-          <Text variant="caption" weight="medium" color="secondary">
-            Total Expenses
-          </Text>
-          <Text variant="headingM" weight="bold" color="expense">
+          <View style={styles.subCardHeader}>
+            <Text variant="caption" weight="medium" color="secondary">
+              Total Expenses
+            </Text>
+            <Ionicons name="arrow-up-circle" size={16} color={colors.expense} />
+          </View>
+          <Text
+            variant="headingM"
+            weight="bold"
+            color="expense"
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            style={styles.subCardAmount}
+          >
             {formatCurrency(summary.totalExpense)}
           </Text>
         </View>
@@ -140,6 +160,16 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     borderRadius: radius.card,
     borderWidth: 1,
+    minWidth: 140,
+  },
+  subCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: spacing.xs,
+  },
+  subCardAmount: {
+    marginTop: 2,
   },
   incomeSubCard: {
     borderLeftWidth: 3.5,

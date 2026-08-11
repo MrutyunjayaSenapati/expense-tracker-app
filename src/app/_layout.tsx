@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Toast } from '../components/ui/Toast';
 import { colors } from '../theme/colors';
-import { apiClient } from '../services/api/apiClient';
 import { useAuthStore } from '../store/useAuthStore';
 
 const queryClient = new QueryClient({
@@ -21,19 +20,26 @@ function ProtectedNavigation() {
   const router = useRouter();
   const segments = useSegments();
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
+  const isInitialized = useAuthStore(state => state.isInitialized);
+  const initializeAuth = useAuthStore(state => state.initializeAuth);
 
   useEffect(() => {
-    const hasToken = apiClient.hasValidToken();
+    initializeAuth();
+  }, [initializeAuth]);
+
+  useEffect(() => {
+    if (!isInitialized) return;
+
     const inAuthGroup = segments[0] === 'auth' || segments[0] === 'onboarding';
 
-    if (!hasToken && !inAuthGroup) {
+    if (!isAuthenticated && !inAuthGroup) {
       // 1. Block access: Unauthenticated users are sent immediately to Login
       router.replace('/auth/login');
-    } else if (hasToken && inAuthGroup) {
+    } else if (isAuthenticated && inAuthGroup) {
       // 2. Authenticated users cannot stay on Login/Register screen
       router.replace('/(tabs)/home');
     }
-  }, [segments, isAuthenticated, router]);
+  }, [segments, isAuthenticated, isInitialized, router]);
 
   return (
     <Stack

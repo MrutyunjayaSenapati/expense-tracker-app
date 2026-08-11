@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useReportData } from '../../hooks/useReportData';
 import { ReportPeriod } from '../../types/reports';
 import { useTheme } from '../../hooks/useTheme';
@@ -26,12 +27,15 @@ export default function ReportsScreen() {
     refetch,
   } = useReportData(period);
 
-  if (isLoading && !reports) {
+  if (isLoading || (!reports && !isError)) {
     return (
       <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
         <View style={styles.header}>
           <Text variant="headingL" weight="bold">
             Financial Reports
+          </Text>
+          <Text variant="bodySmall" color="secondary">
+            Insights and spending patterns
           </Text>
         </View>
         <ScrollView contentContainerStyle={styles.content}>
@@ -70,44 +74,56 @@ export default function ReportsScreen() {
         }
       >
         {/* Screen Header */}
-        <View style={styles.header}>
+        <Animated.View entering={FadeInDown.duration(300)} style={styles.header}>
           <Text variant="headingL" weight="bold">
             Financial Reports
           </Text>
           <Text variant="bodySmall" color="secondary">
             Insights and spending patterns
           </Text>
-        </View>
+        </Animated.View>
 
         {/* Period Selector (Week | Month | Year) */}
-        <ReportPeriodSelector
-          period={period}
-          onChange={setPeriod}
-          style={styles.periodSelector}
-        />
+        <Animated.View entering={FadeInDown.delay(50).duration(300)}>
+          <ReportPeriodSelector
+            period={period}
+            onChange={setPeriod}
+            style={styles.periodSelector}
+          />
+        </Animated.View>
 
         {/* Summary Hero Cards */}
-        <ReportSummaryCards summary={reports.summary} />
+        <Animated.View entering={FadeInDown.delay(100).duration(300)}>
+          <ReportSummaryCards summary={reports.summary} />
+        </Animated.View>
 
         {/* Expense Category Breakdown */}
-        <SpendingBreakdownChart
-          categories={reports.categoryBreakdown}
-          title="Expense Breakdown"
-        />
+        <Animated.View entering={FadeInDown.delay(150).duration(300)}>
+          <SpendingBreakdownChart
+            categories={reports.categoryBreakdown}
+            title="Expense Breakdown"
+          />
+        </Animated.View>
 
         {/* Income Category Breakdown */}
         {reports.incomeCategories.length > 0 && (
-          <SpendingBreakdownChart
-            categories={reports.incomeCategories}
-            title="Income Sources"
-          />
+          <Animated.View entering={FadeInDown.delay(200).duration(300)}>
+            <SpendingBreakdownChart
+              categories={reports.incomeCategories}
+              title="Income Sources"
+            />
+          </Animated.View>
         )}
 
         {/* Timeline Spending Trend */}
-        <MonthlyTrendChart data={reports.spendingTrend} />
+        <Animated.View entering={FadeInDown.delay(250).duration(300)}>
+          <MonthlyTrendChart data={reports.spendingTrend} />
+        </Animated.View>
 
         {/* Payment Method Breakdown */}
-        <PaymentMethodCard paymentMethods={reports.paymentMethodBreakdown} />
+        <Animated.View entering={FadeInDown.delay(300).duration(300)}>
+          <PaymentMethodCard paymentMethods={reports.paymentMethodBreakdown} />
+        </Animated.View>
       </ScrollView>
     </SafeAreaView>
   );

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { CategorySpending } from '../../../types/reports';
-import { colors } from '../../../theme/colors';
+import { useTheme } from '../../../hooks/useTheme';
 import { spacing } from '../../../theme/spacing';
 import { radius } from '../../../theme/radius';
 import { Text } from '../../../components/ui/Text';
@@ -19,15 +19,19 @@ export const SpendingBreakdownChart: React.FC<SpendingBreakdownChartProps> = ({
   categories,
   title = 'Spending by Category',
 }) => {
+  const { colors } = useTheme();
+
   if (categories.length === 0) {
     return (
       <Card variant="solid" elevation="sm" style={styles.card}>
         <Text variant="headingS" weight="bold" style={styles.headerTitle}>
           {title}
         </Text>
-        <Text variant="body" color="secondary" align="center" style={styles.emptyText}>
-          No expense transactions found for this period.
-        </Text>
+        <View style={styles.emptyContainer}>
+          <Text variant="body" color="secondary" align="center" style={styles.emptyText}>
+            No transactions found for this period.
+          </Text>
+        </View>
       </Card>
     );
   }
@@ -39,14 +43,14 @@ export const SpendingBreakdownChart: React.FC<SpendingBreakdownChartProps> = ({
       </Text>
 
       {/* Multi-segment stacked bar preview */}
-      <View style={styles.stackedBarContainer}>
+      <View style={[styles.stackedBarContainer, { backgroundColor: colors.surfaceMuted }]}>
         {categories.map(cat => (
           <View
             key={cat.categoryId}
             style={[
               styles.stackedBarSegment,
               {
-                width: `${cat.percentage}%`,
+                width: `${Math.max(cat.percentage, 1.5)}%`,
                 backgroundColor: cat.categoryColor,
               },
             ]}
@@ -66,10 +70,15 @@ export const SpendingBreakdownChart: React.FC<SpendingBreakdownChartProps> = ({
 
             <View style={styles.itemContent}>
               <View style={styles.topLine}>
-                <Text variant="body" weight="semibold" numberOfLines={1} style={styles.catName}>
+                <Text
+                  variant="body"
+                  weight="semibold"
+                  numberOfLines={1}
+                  style={styles.catName}
+                >
                   {cat.categoryName}
                 </Text>
-                <Text variant="body" weight="bold">
+                <Text variant="body" weight="bold" numberOfLines={1}>
                   {formatCurrency(cat.amount)}
                 </Text>
               </View>
@@ -82,7 +91,12 @@ export const SpendingBreakdownChart: React.FC<SpendingBreakdownChartProps> = ({
                   autoColor={false}
                   style={styles.progressBar}
                 />
-                <View style={styles.pctBadge}>
+                <View
+                  style={[
+                    styles.pctBadge,
+                    { backgroundColor: colors.surfaceMuted },
+                  ]}
+                >
                   <Text variant="caption" weight="semibold" color="secondary">
                     {`${cat.percentage}%`}
                   </Text>
@@ -98,21 +112,24 @@ export const SpendingBreakdownChart: React.FC<SpendingBreakdownChartProps> = ({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface,
     marginBottom: spacing.lg,
   },
   headerTitle: {
     marginBottom: spacing.md,
   },
-  emptyText: {
+  emptyContainer: {
     paddingVertical: spacing.xl,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyText: {
+    fontStyle: 'italic',
   },
   stackedBarContainer: {
     flexDirection: 'row',
-    height: 12,
-    borderRadius: radius.xs,
+    height: 10,
+    borderRadius: radius.full,
     overflow: 'hidden',
-    backgroundColor: colors.surfaceMuted,
     marginBottom: spacing.lg,
   },
   stackedBarSegment: {
@@ -133,22 +150,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.xs,
+    marginBottom: 6,
+    gap: spacing.xs,
   },
   catName: {
     flex: 1,
-    marginRight: spacing.sm,
   },
   progressRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: spacing.xs,
   },
   progressBar: {
     flex: 1,
   },
   pctBadge: {
-    marginLeft: spacing.sm,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: radius.xs,
     minWidth: 40,
-    alignItems: 'flex-end',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

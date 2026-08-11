@@ -23,6 +23,26 @@ export interface BudgetFormProps {
   mode?: 'create' | 'edit';
 }
 
+function getCurrentMonthBounds() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const start = new Date(year, month, 1);
+  const end = new Date(year, month + 1, 0);
+
+  const fmt = (d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  };
+
+  return {
+    startDate: fmt(start),
+    endDate: fmt(end),
+  };
+}
+
 export const BudgetForm: React.FC<BudgetFormProps> = ({
   initialValues,
   categories,
@@ -34,6 +54,7 @@ export const BudgetForm: React.FC<BudgetFormProps> = ({
   const { colors } = useTheme();
   const [categorySheetVisible, setCategorySheetVisible] = useState(false);
   const expenseCategories = categories.filter(c => c.type === 'expense');
+  const monthBounds = getCurrentMonthBounds();
 
   const {
     control,
@@ -48,8 +69,8 @@ export const BudgetForm: React.FC<BudgetFormProps> = ({
       amount: initialValues?.amount || ('' as unknown as number),
       categoryId: initialValues?.categoryId || '',
       period: initialValues?.period || 'monthly',
-      startDate: initialValues?.startDate || '2026-08-01T00:00:00.000Z',
-      endDate: initialValues?.endDate || '2026-08-31T23:59:59.999Z',
+      startDate: initialValues?.startDate || monthBounds.startDate,
+      endDate: initialValues?.endDate || monthBounds.endDate,
     },
   });
 

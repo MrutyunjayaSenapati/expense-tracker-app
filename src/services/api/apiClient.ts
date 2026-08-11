@@ -61,10 +61,16 @@ class ApiClient {
   private baseUrl: string;
   private tokens: AuthTokens | null = null;
   private authPromise: Promise<void> | null = null;
+  private initPromise: Promise<void>;
 
   constructor() {
     this.baseUrl = resolveBaseUrl();
-    this.loadTokensFromStorage();
+    this.initPromise = this.loadTokensFromStorage();
+  }
+
+  public async isReady(): Promise<boolean> {
+    await this.initPromise;
+    return this.hasValidToken();
   }
 
   public getBaseUrl(): string {
@@ -89,6 +95,14 @@ class ApiClient {
         if (stored) {
           this.tokens = JSON.parse(stored);
         }
+      }
+
+      if (__DEV__ && this.tokens?.accessToken) {
+        console.log('🔑 [Auth Token Loaded from SecureStore]', {
+          hasToken: true,
+          expiresInMinutes: Math.round((this.tokens.expiresAt - Date.now()) / 60000),
+          expiresAt: new Date(this.tokens.expiresAt).toLocaleTimeString(),
+        });
       }
     } catch {
       // Ignored
@@ -196,6 +210,8 @@ class ApiClient {
   }
 
   public async ensureAuthenticated(): Promise<string> {
+    await this.initPromise;
+
     if (this.tokens && this.tokens.expiresAt > Date.now() + 60000) {
       return this.tokens.accessToken;
     }
@@ -257,6 +273,11 @@ class ApiClient {
     }
 
     const url = endpoint.startsWith('http') ? endpoint : `${this.baseUrl}${endpoint}`;
+    const method = options.method || 'GET';
+
+    if (__DEV__) {
+      console.log(`📡 [API ${method}] ${url}`, options.body ? JSON.parse(options.body as string) : '');
+    }
 
     let response = await fetch(url, {
       ...options,
@@ -281,15 +302,37 @@ class ApiClient {
     }
 
     if (response.status === 204) {
+      if (__DEV__) {
+        console.log(`📥 [API Response 204 No Content] ${url}`);
+      }
       return null as unknown as T;
     }
 
     const data = await response.json().catch(() => null);
 
+    if (__DEV__) {
+      if (response.ok) {
+        console.log(`📥 [API Response ${response.status}] ${url}`, data);
+      } else {
+        console.warn(`❌ [API Error ${response.status}] ${url}`, data);
+      }
+    }
+
     if (!response.ok) {
       const errorDetail = data?.error;
+      let errorMessage = errorDetail?.message || response.statusText || 'An unexpected error occurred';
+      
+      if (errorDetail?.fields && typeof errorDetail.fields === 'object') {
+        const fieldErrors = Object.entries(errorDetail.fields)
+          .map(([k, v]) => `${k}: ${v}`)
+          .join(', ');
+        if (fieldErrors) {
+          errorMessage = `${errorMessage}: ${fieldErrors}`;
+        }
+      }
+
       throw new ApiError(
-        errorDetail?.message || response.statusText || 'An unexpected error occurred',
+        errorMessage,
         errorDetail?.code || 'HTTP_ERROR',
         response.status,
         errorDetail?.fields

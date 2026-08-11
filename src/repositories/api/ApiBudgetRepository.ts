@@ -45,6 +45,14 @@ function mapBudgetFromApi(item: ApiBudgetItem): Budget {
   };
 }
 
+function toDateOnly(dateVal?: string): string {
+  if (!dateVal) {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+  }
+  return dateVal.includes('T') ? dateVal.split('T')[0] : dateVal;
+}
+
 export class ApiBudgetRepository implements BudgetRepository {
   async getBudgets(): Promise<Budget[]> {
     try {
@@ -76,8 +84,8 @@ export class ApiBudgetRepository implements BudgetRepository {
         name: input.name,
         amount: input.amount.toFixed(2),
         period: input.period.toUpperCase(),
-        start_date: input.startDate,
-        end_date: input.endDate,
+        start_date: toDateOnly(input.startDate),
+        end_date: toDateOnly(input.endDate),
         categories: categoriesPayload,
       }),
     });
@@ -88,8 +96,8 @@ export class ApiBudgetRepository implements BudgetRepository {
     const body: Record<string, unknown> = {};
     if (input.name !== undefined) body.name = input.name;
     if (input.amount !== undefined) body.amount = input.amount.toFixed(2);
-    if (input.startDate) body.start_date = input.startDate;
-    if (input.endDate) body.end_date = input.endDate;
+    if (input.startDate) body.start_date = toDateOnly(input.startDate);
+    if (input.endDate) body.end_date = toDateOnly(input.endDate);
 
     const data = await apiClient.request<ApiBudgetItem>(`/budgets/${id}`, {
       method: 'PATCH',

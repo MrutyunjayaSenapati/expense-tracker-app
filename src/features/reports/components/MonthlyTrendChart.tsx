@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { SpendingTrendPoint } from '../../../types/reports';
-import { colors } from '../../../theme/colors';
+import { useTheme } from '../../../hooks/useTheme';
 import { spacing } from '../../../theme/spacing';
 import { radius } from '../../../theme/radius';
 import { Text } from '../../../components/ui/Text';
@@ -12,12 +12,16 @@ export interface MonthlyTrendChartProps {
 }
 
 export const MonthlyTrendChart: React.FC<MonthlyTrendChartProps> = ({ data }) => {
+  const { colors } = useTheme();
+
   if (data.length === 0) return null;
 
   const maxVal = Math.max(
     ...data.map(d => Math.max(d.income, d.expense)),
     1000
   );
+
+  const isCompact = data.length <= 7;
 
   return (
     <Card variant="solid" elevation="sm" style={styles.card}>
@@ -41,47 +45,57 @@ export const MonthlyTrendChart: React.FC<MonthlyTrendChartProps> = ({ data }) =>
         </View>
       </View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chartScroll}>
-        <View style={styles.chartBody}>
-          {data.map((point, index) => {
-            const incomeHeight = (point.income / maxVal) * 110;
-            const expenseHeight = (point.expense / maxVal) * 110;
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.chartBody,
+          isCompact && styles.chartBodyCompact,
+        ]}
+      >
+        {data.map((point, index) => {
+          const incomeHeight = (point.income / maxVal) * 110;
+          const expenseHeight = (point.expense / maxVal) * 110;
 
-            return (
-              <View key={index} style={styles.barGroup}>
-                <View style={styles.barsContainer}>
-                  {/* Income bar */}
-                  {point.income > 0 && (
-                    <View
-                      style={[
-                        styles.bar,
-                        {
-                          height: Math.max(incomeHeight, 6),
-                          backgroundColor: colors.income,
-                        },
-                      ]}
-                    />
-                  )}
-                  {/* Expense bar */}
-                  {point.expense > 0 && (
-                    <View
-                      style={[
-                        styles.bar,
-                        {
-                          height: Math.max(expenseHeight, 6),
-                          backgroundColor: colors.expense,
-                        },
-                      ]}
-                    />
-                  )}
-                </View>
-                <Text variant="caption" color="tertiary" style={styles.pointLabel}>
-                  {point.label}
-                </Text>
+          return (
+            <View key={index} style={styles.barGroup}>
+              <View style={[styles.barsContainer, { backgroundColor: colors.surfaceMuted }]}>
+                {/* Income bar */}
+                {point.income > 0 && (
+                  <View
+                    style={[
+                      styles.bar,
+                      {
+                        height: Math.max(incomeHeight, 8),
+                        backgroundColor: colors.income,
+                      },
+                    ]}
+                  />
+                )}
+                {/* Expense bar */}
+                {point.expense > 0 && (
+                  <View
+                    style={[
+                      styles.bar,
+                      {
+                        height: Math.max(expenseHeight, 8),
+                        backgroundColor: colors.expense,
+                      },
+                    ]}
+                  />
+                )}
               </View>
-            );
-          })}
-        </View>
+              <Text
+                variant="caption"
+                color="secondary"
+                numberOfLines={1}
+                style={styles.pointLabel}
+              >
+                {point.label}
+              </Text>
+            </View>
+          );
+        })}
       </ScrollView>
     </Card>
   );
@@ -89,7 +103,6 @@ export const MonthlyTrendChart: React.FC<MonthlyTrendChartProps> = ({ data }) =>
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface,
     marginBottom: spacing.lg,
   },
   header: {
@@ -97,6 +110,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: spacing.md,
+    flexWrap: 'wrap',
+    gap: spacing.xs,
   },
   legend: {
     flexDirection: 'row',
@@ -112,34 +127,41 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
   },
-  chartScroll: {
-    paddingVertical: spacing.xs,
-  },
   chartBody: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    minHeight: 140,
-    gap: spacing.lg,
-    paddingHorizontal: spacing.xs,
+    minHeight: 145,
+    gap: spacing.md,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: 2,
+  },
+  chartBodyCompact: {
+    flexGrow: 1,
+    justifyContent: 'space-around',
   },
   barGroup: {
     alignItems: 'center',
-    width: 44,
+    minWidth: 38,
   },
   barsContainer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    height: 110,
-    gap: 4,
+    justifyContent: 'center',
+    height: 115,
+    paddingHorizontal: 3,
+    paddingBottom: 2,
+    borderRadius: radius.sm,
+    gap: 3,
   },
   bar: {
-    width: 12,
+    width: 10,
     borderTopLeftRadius: radius.xs,
     borderTopRightRadius: radius.xs,
   },
   pointLabel: {
-    marginTop: spacing.xs,
+    marginTop: 6,
     fontSize: 10,
     textAlign: 'center',
+    fontWeight: '500',
   },
 });

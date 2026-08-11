@@ -35,7 +35,7 @@ export default function HomeScreen() {
   const { data: categories = [] } = useCategories();
   const { data: accounts = [] } = useAccounts();
 
-  if (isDashboardLoading && !dashboard) {
+  if (isDashboardLoading || (!dashboard && !isError)) {
     return (
       <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
         <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -47,7 +47,7 @@ export default function HomeScreen() {
     );
   }
 
-  if (isError || !dashboard) {
+  if (isError) {
     return (
       <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
         <ErrorState
