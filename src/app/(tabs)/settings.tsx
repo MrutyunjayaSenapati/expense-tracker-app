@@ -3,9 +3,8 @@ import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useUser, useUpdateCurrency } from '../../hooks/useUser';
 import { useAuth } from '../../hooks/useAuth';
-import { useAppStore, ThemeMode } from '../../store/useAppStore';
+import type { ThemeMode } from '../../store/useAppStore';
 import { useTheme } from '../../hooks/useTheme';
-import { useQueryClient } from '@tanstack/react-query';
 import { CurrencyCode, CURRENCIES } from '../../types/currency';
 import { spacing } from '../../theme/spacing';
 import { radius } from '../../theme/radius';
@@ -18,9 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const { colors, themeMode, setThemeMode } = useTheme();
-  const showToast = useAppStore(state => state.showToast);
 
   const { data: user } = useUser();
   const { logout, isLoading: isAuthLoading } = useAuth();

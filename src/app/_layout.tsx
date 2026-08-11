@@ -33,7 +33,7 @@ function ProtectedNavigation() {
       // 2. Authenticated users cannot stay on Login/Register screen
       router.replace('/(tabs)/home');
     }
-  }, [segments, isAuthenticated]);
+  }, [segments, isAuthenticated, router]);
 
   return (
     <Stack

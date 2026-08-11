@@ -75,7 +75,7 @@ class ApiClient {
     this.baseUrl = url;
   }
 
-  private loadTokensFromStorage() {
+  private async loadTokensFromStorage() {
     try {
       if (Platform.OS === 'web') {
         if (typeof window !== 'undefined' && window.localStorage) {
@@ -85,7 +85,7 @@ class ApiClient {
           }
         }
       } else {
-        const stored = SecureStore.getItemSync(STORAGE_KEY);
+        const stored = await SecureStore.getItemAsync(STORAGE_KEY);
         if (stored) {
           this.tokens = JSON.parse(stored);
         }
@@ -108,7 +108,7 @@ class ApiClient {
         }
       } else {
         if (tokens) {
-          SecureStore.setItemSync(STORAGE_KEY, JSON.stringify(tokens));
+          SecureStore.setItemAsync(STORAGE_KEY, JSON.stringify(tokens)).catch(() => {});
         } else {
           SecureStore.deleteItemAsync(STORAGE_KEY).catch(() => {});
         }

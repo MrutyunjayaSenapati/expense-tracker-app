@@ -7,10 +7,9 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
-import Svg, { Path, Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
 import { useTheme } from '../../hooks/useTheme';
 import { useAuth } from '../../hooks/useAuth';
 import { spacing } from '../../theme/spacing';
@@ -23,7 +22,6 @@ import { BrandLogo } from '../../components/ui/BrandLogo';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function AuthScreen() {
-  const router = useRouter();
   const params = useLocalSearchParams();
   const { colors } = useTheme();
   const { login, register, isLoading } = useAuth();
