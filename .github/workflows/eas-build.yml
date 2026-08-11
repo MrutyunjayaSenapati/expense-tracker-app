@@ -28,6 +28,11 @@ jobs:
       - name: 📥 Install Dependencies
         run: npm install
 
+      - name: ⚙️ Configure EAS Project
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: npx eas-cli init --account mrnobody007 --non-interactive || true
+
       - name: 🚀 Trigger EAS Android Preview Build
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
