@@ -26,7 +26,7 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: 📥 Install Dependencies
-        run: npm ci
+        run: npm install
 
       - name: 🚀 Trigger EAS Android Preview Build
         env:
