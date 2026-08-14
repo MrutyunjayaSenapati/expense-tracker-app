@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -24,6 +24,10 @@ export const AccountForm: React.FC<AccountFormProps> = ({
   isSubmitting = false,
   mode = 'create',
 }) => {
+  const [balanceText, setBalanceText] = useState(
+    initialValues?.balance !== undefined ? String(initialValues.balance) : ''
+  );
+
   const {
     control,
     handleSubmit,
@@ -36,7 +40,7 @@ export const AccountForm: React.FC<AccountFormProps> = ({
       name: initialValues?.name || '',
       type: initialValues?.type || 'bank',
       institutionName: initialValues?.institutionName || '',
-      balance: initialValues?.balance || ('' as unknown as number),
+      balance: initialValues?.balance ?? 0,
       icon: initialValues?.icon || 'wallet',
     },
   });
@@ -98,16 +102,22 @@ export const AccountForm: React.FC<AccountFormProps> = ({
         <Controller
           control={control}
           name="balance"
-          render={({ field: { onChange, value } }) => (
+          render={({ field: { onChange } }) => (
             <Input
               label="CURRENT BALANCE"
               prefix="₹"
               placeholder="0"
               keyboardType="decimal-pad"
-              value={value !== undefined ? String(value) : ''}
+              value={balanceText}
               onChangeText={text => {
                 const cleaned = text.replace(/[^0-9.-]/g, '');
-                onChange(cleaned === '' ? '' : parseFloat(cleaned));
+                setBalanceText(cleaned);
+                if (cleaned === '' || cleaned === '-' || cleaned === '.') {
+                  onChange(0);
+                } else {
+                  const parsed = parseFloat(cleaned);
+                  onChange(Number.isNaN(parsed) ? 0 : parsed);
+                }
               }}
               error={errors.balance?.message}
             />

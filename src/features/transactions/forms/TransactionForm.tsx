@@ -27,6 +27,7 @@ import { BottomSheet } from '../../../components/ui/BottomSheet';
 import { CategoryIcon } from '../../../components/ui/CategoryIcon';
 import { AnimatedPressable } from '../../../components/ui/AnimatedPressable';
 import { LottieAnimation } from '../../../components/ui/LottieAnimation';
+import { useRouter } from 'expo-router';
 import { useHaptics } from '../../../hooks/useHaptics';
 import { formatCurrency } from '../../../utils/currency';
 import { formatDate } from '../../../utils/date';
@@ -51,6 +52,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
   isSubmitting = false,
   mode = 'create',
 }) => {
+  const router = useRouter();
   const { colors } = useTheme();
   const [categorySheetVisible, setCategorySheetVisible] = useState(false);
   const [accountSheetVisible, setAccountSheetVisible] = useState(false);
@@ -501,44 +503,75 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
         title="Select Payment Account"
       >
         <View style={styles.sheetContainer}>
-          <ScrollView style={styles.accountScrollView} showsVerticalScrollIndicator={false}>
-            {accounts.map(acc => {
-              const isSelected = acc.id === selectedAccountId;
-              return (
-                <AnimatedPressable
-                  key={acc.id}
-                  onPress={() => {
-                    setValue('accountId', acc.id);
-                    setAccountSheetVisible(false);
-                  }}
-                  scaleTo={0.98}
-                  style={[
-                    styles.accountListItem,
-                    { backgroundColor: colors.surface, borderColor: colors.border },
-                    isSelected && { borderColor: colors.primary, backgroundColor: colors.primaryLight },
-                  ]}
-                >
-                  <View style={styles.categoryItemLeft}>
-                    <View style={[styles.accountCircle, { backgroundColor: colors.surfaceMuted }]}>
-                      <Ionicons name="wallet-outline" size={18} color={colors.primary} />
+          {accounts.length === 0 ? (
+            <View style={styles.emptyAccountState}>
+              <View style={[styles.emptyAccountIconBox, { backgroundColor: colors.surfaceMuted }]}>
+                <Ionicons name="wallet-outline" size={32} color={colors.primary} />
+              </View>
+              <Text variant="headingS" weight="bold" align="center" style={{ marginTop: spacing.sm }}>
+                No Accounts Found
+              </Text>
+              <Text
+                variant="bodySmall"
+                color="secondary"
+                align="center"
+                style={{ marginTop: 4, marginBottom: spacing.lg, paddingHorizontal: spacing.md }}
+              >
+                Create a payment account (Bank, Cash, or UPI) to record transactions.
+              </Text>
+              <Button
+                variant="primary"
+                size="md"
+                onPress={() => {
+                  setAccountSheetVisible(false);
+                  router.push('/accounts/create');
+                }}
+                fullWidth
+                iconLeft={<Ionicons name="add" size={18} color="#FFFFFF" />}
+              >
+                Create Account
+              </Button>
+            </View>
+          ) : (
+            <ScrollView style={styles.accountScrollView} showsVerticalScrollIndicator={false}>
+              {accounts.map(acc => {
+                const isSelected = acc.id === selectedAccountId;
+                return (
+                  <AnimatedPressable
+                    key={acc.id}
+                    onPress={() => {
+                      setValue('accountId', acc.id);
+                      setAccountSheetVisible(false);
+                    }}
+                    scaleTo={0.98}
+                    style={[
+                      styles.accountListItem,
+                      { backgroundColor: colors.surface, borderColor: colors.border },
+                      isSelected && { borderColor: colors.primary, backgroundColor: colors.primaryLight },
+                    ]}
+                  >
+                    <View style={styles.categoryItemLeft}>
+                      <View style={[styles.accountCircle, { backgroundColor: colors.surfaceMuted }]}>
+                        <Ionicons name="wallet-outline" size={18} color={colors.primary} />
+                      </View>
+                      <View>
+                        <Text variant="body" weight="semibold">
+                          {acc.name}
+                        </Text>
+                        <Text variant="caption" color="secondary">
+                          {acc.type.toUpperCase()} · Balance: {formatCurrency(acc.balance)}
+                        </Text>
+                      </View>
                     </View>
-                    <View>
-                      <Text variant="body" weight="semibold">
-                        {acc.name}
-                      </Text>
-                      <Text variant="caption" color="secondary">
-                        {acc.type.toUpperCase()} · Balance: {formatCurrency(acc.balance)}
-                      </Text>
-                    </View>
-                  </View>
 
-                  {isSelected && (
-                    <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
-                  )}
-                </AnimatedPressable>
-              );
-            })}
-          </ScrollView>
+                    {isSelected && (
+                      <Ionicons name="checkmark-circle" size={20} color={colors.primary} />
+                    )}
+                  </AnimatedPressable>
+                );
+              })}
+            </ScrollView>
+          )}
         </View>
       </BottomSheet>
 
@@ -687,6 +720,19 @@ const styles = StyleSheet.create({
   },
   sheetContainer: {
     paddingVertical: spacing.xs,
+  },
+  emptyAccountState: {
+    alignItems: 'center',
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.md,
+  },
+  emptyAccountIconBox: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.xs,
   },
   searchBox: {
     flexDirection: 'row',

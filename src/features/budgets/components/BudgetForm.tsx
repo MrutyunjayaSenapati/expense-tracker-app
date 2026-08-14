@@ -56,6 +56,10 @@ export const BudgetForm: React.FC<BudgetFormProps> = ({
   const expenseCategories = categories.filter(c => c.type === 'expense');
   const monthBounds = getCurrentMonthBounds();
 
+  const [amountText, setAmountText] = useState(
+    initialValues?.amount && initialValues.amount > 0 ? String(initialValues.amount) : ''
+  );
+
   const {
     control,
     handleSubmit,
@@ -67,7 +71,7 @@ export const BudgetForm: React.FC<BudgetFormProps> = ({
     resolver: zodResolver(budgetFormSchema),
     defaultValues: {
       name: initialValues?.name || '',
-      amount: initialValues?.amount || ('' as unknown as number),
+      amount: initialValues?.amount ?? 0,
       categoryId: initialValues?.categoryId || '',
       period: initialValues?.period || 'monthly',
       startDate: initialValues?.startDate || monthBounds.startDate,
@@ -102,16 +106,22 @@ export const BudgetForm: React.FC<BudgetFormProps> = ({
         <Controller
           control={control}
           name="amount"
-          render={({ field: { onChange, value } }) => (
+          render={({ field: { onChange } }) => (
             <Input
               label="BUDGET AMOUNT LIMIT"
               prefix="₹"
               placeholder="0"
               keyboardType="decimal-pad"
-              value={value ? String(value) : ''}
+              value={amountText}
               onChangeText={text => {
                 const cleaned = text.replace(/[^0-9.]/g, '');
-                onChange(cleaned === '' ? '' : parseFloat(cleaned));
+                setAmountText(cleaned);
+                if (cleaned === '' || cleaned === '.') {
+                  onChange(0);
+                } else {
+                  const parsed = parseFloat(cleaned);
+                  onChange(Number.isNaN(parsed) ? 0 : parsed);
+                }
               }}
               error={errors.amount?.message}
             />
