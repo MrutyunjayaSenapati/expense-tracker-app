@@ -5,6 +5,7 @@ import { spacing } from '../../../theme/spacing';
 import { radius } from '../../../theme/radius';
 import { Text } from '../../../components/ui/Text';
 import { AnimatedPressable } from '../../../components/ui/AnimatedPressable';
+import { LottieAnimation } from '../../../components/ui/LottieAnimation';
 import { getGreeting, formatMonthYear } from '../../../utils/date';
 import { Ionicons } from '@expo/vector-icons';
 import { User } from '../../../types/user';
@@ -42,9 +43,14 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       </View>
 
       <View style={styles.rightGroup}>
-        {/* Real Streak Pill from Backend */}
+        {/* Animated Streak Pill */}
         <View style={[styles.streakPill, { backgroundColor: colors.streakSoft }]}>
-          <Ionicons name="flame" size={13} color={colors.streakOrange} />
+          <LottieAnimation
+            source={require('../../../../assets/animations/flame.json')}
+            width={18}
+            height={18}
+            style={styles.flameAnim}
+          />
           <Text variant="caption" weight="bold" style={{ color: colors.streakOrange, fontSize: 11 }}>
             {`${streakDays}d streak`}
           </Text>
@@ -109,9 +115,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingVertical: 3,
     borderRadius: radius.full,
-    gap: 3,
+    gap: 2,
+  },
+  flameAnim: {
+    marginRight: -1,
   },
   iconButton: {
     width: 34,
@@ -138,5 +147,3 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
   },
 });
-
-

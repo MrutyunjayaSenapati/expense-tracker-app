@@ -43,14 +43,11 @@ export function useDashboardData() {
         return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
       });
 
-      const relevantTransactions =
-        currentMonthTransactions.length > 0 ? currentMonthTransactions : transactions;
-
       const { income: totalIncome, expense: totalExpense, netSavings } =
-        calculateTotals(relevantTransactions);
+        calculateTotals(currentMonthTransactions);
 
-      const incomeCount = relevantTransactions.filter(t => t.type === 'income').length;
-      const expenseCount = relevantTransactions.filter(t => t.type === 'expense').length;
+      const incomeCount = currentMonthTransactions.filter(t => t.type === 'income').length;
+      const expenseCount = currentMonthTransactions.filter(t => t.type === 'expense').length;
 
       const savingsRate =
         totalIncome > 0 ? Math.min(100, Math.max(0, Math.round((netSavings / totalIncome) * 100))) : 0;
@@ -61,7 +58,7 @@ export function useDashboardData() {
       const budgetStatus = calculateBudgetStatus(monthlyBudgetSpent, monthlyBudget);
 
       const categorySpending = calculateCategorySpending(
-        relevantTransactions,
+        currentMonthTransactions,
         categories,
         'expense'
       );

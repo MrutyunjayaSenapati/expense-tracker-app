@@ -5,12 +5,12 @@ import { Category } from '../../../types/category';
 import { Account } from '../../../types/account';
 import { useTheme } from '../../../hooks/useTheme';
 import { spacing } from '../../../theme/spacing';
-import { radius } from '../../../theme/radius';
 import { Text } from '../../../components/ui/Text';
 import { CategoryIcon } from '../../../components/ui/CategoryIcon';
 import { AnimatedPressable } from '../../../components/ui/AnimatedPressable';
+import { SwipeableRow, SwipeableAction } from '../../../components/ui/SwipeableRow';
 import { formatCurrency } from '../../../utils/currency';
-import { formatRelativeDate } from '../../../utils/date';
+import { formatTime } from '../../../utils/date';
 import { Ionicons } from '@expo/vector-icons';
 
 export interface TransactionRowProps {
@@ -18,7 +18,11 @@ export interface TransactionRowProps {
   category?: Category | null;
   account?: Account | null;
   onPress?: () => void;
+  onDelete?: () => void;
+  onEdit?: () => void;
   style?: StyleProp<ViewStyle>;
+  enableSwipe?: boolean;
+  showTimeOnly?: boolean;
 }
 
 export const TransactionRow: React.FC<TransactionRowProps> = ({
@@ -26,15 +30,37 @@ export const TransactionRow: React.FC<TransactionRowProps> = ({
   category,
   account,
   onPress,
+  onDelete,
+  onEdit,
   style,
+  enableSwipe = false,
+  showTimeOnly = false,
 }) => {
   const { colors } = useTheme();
   const isExpense = transaction.type === 'expense';
   const categoryName = category?.name || 'General';
   const title = transaction.merchant || transaction.note || categoryName;
 
+  const leftAction: SwipeableAction | undefined = onEdit
+    ? {
+        icon: 'pencil',
+        backgroundColor: colors.primary,
+        onPress: onEdit,
+        accessibilityLabel: 'Edit transaction',
+      }
+    : undefined;
+
+  const rightAction: SwipeableAction | undefined = onDelete
+    ? {
+        icon: 'trash',
+        backgroundColor: colors.error || '#EF4444',
+        onPress: onDelete,
+        accessibilityLabel: 'Delete transaction',
+      }
+    : undefined;
+
   const content = (
-    <View style={[styles.container, { backgroundColor: colors.surface }, style]}>
+    <View style={[styles.container, style]}>
       {/* Category Icon */}
       <CategoryIcon
         icon={category?.icon ?? 'cash'}
@@ -46,7 +72,7 @@ export const TransactionRow: React.FC<TransactionRowProps> = ({
       <View style={styles.centerCol}>
         <View style={styles.titleRow}>
           <Text
-            variant="bodyLarge"
+            variant="body"
             weight="semibold"
             numberOfLines={1}
             style={styles.titleText}
@@ -56,7 +82,7 @@ export const TransactionRow: React.FC<TransactionRowProps> = ({
           {transaction.receiptId && (
             <Ionicons
               name="attach"
-              size={14}
+              size={13}
               color={colors.textTertiary}
               style={styles.receiptIcon}
             />
@@ -69,45 +95,54 @@ export const TransactionRow: React.FC<TransactionRowProps> = ({
         </Text>
       </View>
 
-      {/* Right Column: Amount and Relative Date */}
+      {/* Right Column: Amount and Time */}
       <View style={styles.rightCol}>
         <Text
-          variant="bodyLarge"
+          variant="body"
           weight="bold"
           color={isExpense ? 'primary' : 'income'}
+          style={styles.amountText}
         >
           {formatCurrency(transaction.amount, { sign: true, type: transaction.type })}
         </Text>
-        <Text variant="caption" color="tertiary">
-          {formatRelativeDate(transaction.date)}
+        <Text variant="caption" color="tertiary" style={styles.timeText}>
+          {formatTime(transaction.date)}
         </Text>
       </View>
     </View>
   );
 
-  if (onPress) {
+  const wrappedRow = onPress ? (
+    <AnimatedPressable
+      onPress={onPress}
+      scaleTo={0.98}
+      testID="transaction-row"
+      accessibilityRole="button"
+      accessibilityLabel={`${title}, ${formatCurrency(transaction.amount)}`}
+    >
+      {content}
+    </AnimatedPressable>
+  ) : (
+    content
+  );
+
+  if (enableSwipe && (leftAction || rightAction)) {
     return (
-      <AnimatedPressable
-        onPress={onPress}
-        scaleTo={0.98}
-        accessibilityRole="button"
-        accessibilityLabel={`${title}, ${formatCurrency(transaction.amount)}`}
-      >
-        {content}
-      </AnimatedPressable>
+      <SwipeableRow leftAction={leftAction} rightAction={rightAction}>
+        {wrappedRow}
+      </SwipeableRow>
     );
   }
 
-  return content;
+  return wrappedRow;
 };
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.sm + 2,
     paddingHorizontal: spacing.md,
-    borderRadius: radius.md,
   },
   centerCol: {
     flex: 1,
@@ -123,9 +158,17 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   receiptIcon: {
-    marginLeft: spacing.xs,
+    marginLeft: 4,
   },
   rightCol: {
     alignItems: 'flex-end',
+    justifyContent: 'center',
+  },
+  amountText: {
+    letterSpacing: -0.2,
+  },
+  timeText: {
+    fontSize: 11.5,
+    marginTop: 1,
   },
 });

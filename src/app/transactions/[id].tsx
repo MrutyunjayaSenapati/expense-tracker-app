@@ -191,6 +191,7 @@ export default function TransactionDetailScreen() {
           size="lg"
           onPress={() => router.push(`/transactions/edit?id=${transaction.id}`)}
           iconLeft={<Ionicons name="create-outline" size={20} color="#FFFFFF" />}
+          testID="edit-transaction"
         >
           Edit Transaction
         </Button>
@@ -200,6 +201,7 @@ export default function TransactionDetailScreen() {
           size="md"
           onPress={() => setDeleteModalVisible(true)}
           iconLeft={<Ionicons name="trash-outline" size={18} color="#FFFFFF" />}
+          testID="delete-transaction"
         >
           Delete Transaction
         </Button>

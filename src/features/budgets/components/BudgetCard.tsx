@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Budget } from '../../../types/budget';
 import { Category } from '../../../types/category';
-import { colors } from '../../../theme/colors';
+import { useTheme } from '../../../hooks/useTheme';
 import { spacing } from '../../../theme/spacing';
 import { Card } from '../../../components/ui/Card';
 import { Text } from '../../../components/ui/Text';
@@ -27,6 +27,7 @@ export const BudgetCard: React.FC<BudgetCardProps> = ({
   category,
   onPress,
 }) => {
+  const { colors } = useTheme();
   const percentage = calculateBudgetPercentage(budget.spent, budget.amount);
   const status = calculateBudgetStatus(budget.spent, budget.amount);
   const remaining = budget.amount - budget.spent;
@@ -44,7 +45,7 @@ export const BudgetCard: React.FC<BudgetCardProps> = ({
   };
 
   return (
-    <Card variant="solid" elevation="sm" onPress={onPress} style={styles.card}>
+    <Card variant={status === 'exceeded' ? 'glow' : 'solid'} elevation="sm" onPress={onPress} style={styles.card}>
       <View style={styles.topRow}>
         <View style={styles.categoryInfo}>
           <CategoryIcon
@@ -107,7 +108,6 @@ export const BudgetCard: React.FC<BudgetCardProps> = ({
 const styles = StyleSheet.create({
   card: {
     marginBottom: spacing.md,
-    backgroundColor: colors.surface,
   },
   topRow: {
     flexDirection: 'row',
@@ -122,6 +122,7 @@ const styles = StyleSheet.create({
   },
   nameCol: {
     marginLeft: spacing.md,
+    flex: 1,
   },
   amountRow: {
     flexDirection: 'row',
@@ -129,11 +130,12 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xs,
   },
   progressBar: {
-    marginBottom: spacing.sm,
+    marginVertical: spacing.xs,
   },
   footerRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: spacing.xs,
   },
 });

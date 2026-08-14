@@ -10,6 +10,8 @@ import { TransactionForm } from '../../features/transactions/forms/TransactionFo
 import { TransactionFormValues } from '../../schemas/transactionSchema';
 import { CardSkeleton } from '../../components/ui/LoadingState';
 
+import { AmbientMeshBackground } from '../../components/ui/AmbientMeshBackground';
+
 export default function AddTransactionScreen() {
   const router = useRouter();
   const { colors } = useTheme();
@@ -29,14 +31,14 @@ export default function AddTransactionScreen() {
       receiptId: values.receiptUri || undefined,
     });
 
-    // Short tactile pause to allow success checkmark feedback
+    // Short tactile pause to allow Lottie celebration feedback
     setTimeout(() => {
       if (router.canGoBack()) {
         router.back();
       } else {
         router.replace('/(tabs)/home');
       }
-    }, 450);
+    }, 750);
   };
 
   if (isCategoriesLoading || isAccountsLoading) {
@@ -51,13 +53,15 @@ export default function AddTransactionScreen() {
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={['bottom', 'left', 'right']}>
-      <TransactionForm
-        categories={categories}
-        accounts={accounts}
-        onSubmit={handleSave}
-        isSubmitting={createTransactionMutation.isPending}
-        mode="create"
-      />
+      <AmbientMeshBackground>
+        <TransactionForm
+          categories={categories}
+          accounts={accounts}
+          onSubmit={handleSave}
+          isSubmitting={createTransactionMutation.isPending}
+          mode="create"
+        />
+      </AmbientMeshBackground>
     </SafeAreaView>
   );
 }

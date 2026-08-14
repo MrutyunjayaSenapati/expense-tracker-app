@@ -1,0 +1,13 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "maestro": {
+      "type": "local",
+      "command": ["C:\\maestro\\maestro\\bin\\maestro.bat", "mcp"],
+      "enabled": true,
+      "environment": {
+        "JAVA_HOME": "C:\\Program Files\\Microsoft\\jdk-17.0.15.6-hotspot"
+      }
+    }
+  }
+}

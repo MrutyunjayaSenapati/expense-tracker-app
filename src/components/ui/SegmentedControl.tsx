@@ -1,11 +1,22 @@
-import React from 'react';
-import { View, StyleSheet, StyleProp, ViewStyle } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  StyleSheet,
+  StyleProp,
+  ViewStyle,
+  TouchableOpacity,
+  LayoutChangeEvent,
+} from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+} from 'react-native-reanimated';
 import { useTheme } from '../../hooks/useTheme';
 import { radius } from '../../theme/radius';
 import { spacing } from '../../theme/spacing';
 import { shadows } from '../../theme/shadows';
 import { Text } from './Text';
-import { AnimatedPressable } from './AnimatedPressable';
 import { useHaptics } from '../../hooks/useHaptics';
 
 export interface SegmentOption<T extends string> {
@@ -20,6 +31,7 @@ export interface SegmentedControlProps<T extends string> {
   onChange: (value: T) => void;
   style?: StyleProp<ViewStyle>;
   semanticColoring?: boolean;
+  testID?: string;
 }
 
 export function SegmentedControl<T extends string>({
@@ -28,9 +40,30 @@ export function SegmentedControl<T extends string>({
   onChange,
   style,
   semanticColoring = true,
+  testID,
 }: SegmentedControlProps<T>) {
   const { colors } = useTheme();
   const haptics = useHaptics();
+
+  const [containerWidth, setContainerWidth] = useState(0);
+  const selectedIndex = options.findIndex(o => o.value === value);
+
+  const thumbPosition = useSharedValue(0);
+
+  useEffect(() => {
+    if (containerWidth > 0 && selectedIndex >= 0) {
+      const segmentWidth = (containerWidth - spacing.xs * 2) / options.length;
+      thumbPosition.value = withSpring(selectedIndex * segmentWidth, {
+        damping: 18,
+        stiffness: 220,
+      });
+    }
+  }, [selectedIndex, containerWidth, options.length, thumbPosition]);
+
+  const handleLayout = (e: LayoutChangeEvent) => {
+    const width = e.nativeEvent.layout.width;
+    setContainerWidth(width);
+  };
 
   const handleSelect = (val: T) => {
     if (val !== value) {
@@ -39,8 +72,24 @@ export function SegmentedControl<T extends string>({
     }
   };
 
+  const segmentWidth = containerWidth > 0 ? (containerWidth - spacing.xs * 2) / options.length : 0;
+
+  const animatedThumbStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateX: thumbPosition.value }],
+      width: segmentWidth,
+    };
+  });
+
+  let activeBackground = colors.surface;
+  if (semanticColoring) {
+    if (value === 'expense') activeBackground = colors.expenseSoft;
+    else if (value === 'income') activeBackground = colors.incomeSoft;
+  }
+
   return (
     <View
+      onLayout={handleLayout}
       style={[
         styles.container,
         {
@@ -50,37 +99,39 @@ export function SegmentedControl<T extends string>({
         style,
       ]}
     >
-      {options.map(option => {
+      {/* Animated Sliding Thumb Pill */}
+      {containerWidth > 0 && (
+        <Animated.View
+          style={[
+            styles.activeThumb,
+            animatedThumbStyle,
+            {
+              backgroundColor: activeBackground,
+              borderColor: colors.border,
+            },
+          ]}
+        />
+      )}
+
+      {/* Segment Option Buttons */}
+      {options.map((option, idx) => {
         const isSelected = option.value === value;
 
-        let activeBackground: string = colors.surface;
         let activeTextColor: 'primary' | 'expense' | 'income' | 'brand' = 'brand';
-
         if (semanticColoring) {
-          if (option.value === 'expense') {
-            activeBackground = isSelected ? colors.expenseSoft : colors.surface;
-            activeTextColor = 'expense';
-          } else if (option.value === 'income') {
-            activeBackground = isSelected ? colors.incomeSoft : colors.surface;
-            activeTextColor = 'income';
-          }
+          if (option.value === 'expense') activeTextColor = 'expense';
+          else if (option.value === 'income') activeTextColor = 'income';
         }
 
         return (
-          <AnimatedPressable
+          <TouchableOpacity
             key={option.value}
             onPress={() => handleSelect(option.value)}
-            scaleTo={0.97}
-            hapticFeedback={false}
+            activeOpacity={0.8}
+            testID={testID ? `${testID}-${option.value}` : undefined}
             accessibilityRole="tab"
             accessibilityState={{ selected: isSelected }}
-            style={[
-              styles.segment,
-              isSelected && [
-                styles.selectedSegment,
-                { backgroundColor: activeBackground },
-              ],
-            ]}
+            style={styles.segment}
           >
             <View style={styles.segmentContent}>
               {option.icon && <View style={styles.icon}>{option.icon}</View>}
@@ -92,7 +143,7 @@ export function SegmentedControl<T extends string>({
                 {option.label}
               </Text>
             </View>
-          </AnimatedPressable>
+          </TouchableOpacity>
         );
       })}
     </View>
@@ -106,16 +157,23 @@ const styles = StyleSheet.create({
     padding: spacing.xs,
     alignItems: 'center',
     borderWidth: 1,
+    position: 'relative',
+  },
+  activeThumb: {
+    position: 'absolute',
+    top: spacing.xs,
+    bottom: spacing.xs,
+    left: spacing.xs,
+    borderRadius: radius.sm,
+    borderWidth: 1,
+    ...shadows.sm,
   },
   segment: {
     flex: 1,
     paddingVertical: spacing.sm + 2,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: radius.sm,
-  },
-  selectedSegment: {
-    ...shadows.sm,
+    zIndex: 2,
   },
   segmentContent: {
     flexDirection: 'row',

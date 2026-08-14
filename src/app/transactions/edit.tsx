@@ -14,11 +14,12 @@ import { TransactionFormValues } from '../../schemas/transactionSchema';
 import { ConfirmationModal } from '../../components/ui/ConfirmationModal';
 import { CardSkeleton } from '../../components/ui/LoadingState';
 import { ErrorState } from '../../components/ui/ErrorState';
-import { colors } from '../../theme/colors';
+import { useTheme } from '../../hooks/useTheme';
 
 export default function EditTransactionScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const { colors } = useTheme();
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
   const { data: transaction, isLoading: isTxnLoading, isError, refetch } = useTransaction(id);
@@ -85,7 +86,7 @@ export default function EditTransactionScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['bottom', 'left', 'right']}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={['bottom', 'left', 'right']}>
       <TransactionForm
         initialValues={{
           type: transaction.type,
@@ -123,7 +124,6 @@ export default function EditTransactionScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   loadingContainer: {
     padding: 16,

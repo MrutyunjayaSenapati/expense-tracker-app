@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Switch } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useUser, useUpdateCurrency } from '../../hooks/useUser';
 import { useAuth } from '../../hooks/useAuth';
-import type { ThemeMode } from '../../store/useAppStore';
+import { useAppStore, type ThemeMode } from '../../store/useAppStore';
 import { useTheme } from '../../hooks/useTheme';
+import { useHaptics } from '../../hooks/useHaptics';
+import { notificationService } from '../../services/notifications/notificationService';
 import { CurrencyCode, CURRENCIES } from '../../types/currency';
 import { spacing } from '../../theme/spacing';
 import { radius } from '../../theme/radius';
@@ -18,15 +20,53 @@ import { Ionicons } from '@expo/vector-icons';
 export default function SettingsScreen() {
   const router = useRouter();
   const { colors, themeMode, setThemeMode } = useTheme();
+  const haptics = useHaptics();
 
   const { data: user } = useUser();
   const { logout, isLoading: isAuthLoading } = useAuth();
   const updateCurrencyMutation = useUpdateCurrency();
 
+  const notificationsEnabled = useAppStore(state => state.notificationsEnabled);
+  const setNotificationsEnabled = useAppStore(state => state.setNotificationsEnabled);
+  const budgetAlertsEnabled = useAppStore(state => state.budgetAlertsEnabled);
+  const setBudgetAlertsEnabled = useAppStore(state => state.setBudgetAlertsEnabled);
+  const showToast = useAppStore(state => state.showToast);
+
   const [currencySheetVisible, setCurrencySheetVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  const [isSendingTest, setIsSendingTest] = useState(false);
 
   const currentCurrency = user?.currency || 'INR';
+
+  const handleToggleNotifications = async (val: boolean) => {
+    haptics.selection();
+    const success = await setNotificationsEnabled(val);
+    if (val && !success) {
+      showToast('Please enable notifications in your phone Settings', 'info');
+    } else if (val) {
+      showToast('Daily reminders enabled for 8:00 PM', 'success');
+    } else {
+      showToast('Daily reminders disabled', 'info');
+    }
+  };
+
+  const handleToggleBudgetAlerts = (val: boolean) => {
+    haptics.selection();
+    setBudgetAlertsEnabled(val);
+    showToast(val ? 'Budget limit alerts enabled' : 'Budget limit alerts disabled', 'info');
+  };
+
+  const handleSendTestNotification = async () => {
+    haptics.medium();
+    setIsSendingTest(true);
+    const sent = await notificationService.sendTestNotification();
+    setIsSendingTest(false);
+    if (sent) {
+      showToast('Sample notification sent! Check your notification tray 🔔', 'success');
+    } else {
+      showToast('Could not send notification. Please check permissions.', 'error');
+    }
+  };
 
   const handleSelectCurrency = async (code: CurrencyCode) => {
     setCurrencySheetVisible(false);
@@ -127,6 +167,85 @@ export default function SettingsScreen() {
             </Text>
             <Ionicons name="chevron-forward" size={18} color={colors.textTertiary} />
           </View>
+        </TouchableOpacity>
+      </Card>
+
+      {/* Notifications Section */}
+      <Text variant="label" color="secondary" style={styles.sectionHeader}>
+        NOTIFICATIONS
+      </Text>
+      <Card elevation="none" style={styles.menuCard}>
+        {/* Daily Reminders */}
+        <View style={styles.menuItem}>
+          <View style={styles.menuLeft}>
+            <View style={[styles.menuIcon, { backgroundColor: colors.streakSoft || 'rgba(255, 107, 0, 0.15)' }]}>
+              <Ionicons name="alarm-outline" size={20} color={colors.streakOrange || '#FF6B00'} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text variant="bodyLarge" weight="semibold">
+                Daily Expense Reminder
+              </Text>
+              <Text variant="caption" color="secondary">
+                {notificationsEnabled ? 'Scheduled daily at 8:00 PM' : 'Reminders are disabled'}
+              </Text>
+            </View>
+          </View>
+          <Switch
+            value={notificationsEnabled}
+            onValueChange={handleToggleNotifications}
+            trackColor={{ false: colors.surfaceMuted, true: colors.primary }}
+            thumbColor="#FFFFFF"
+          />
+        </View>
+
+        <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+        {/* Budget Limit Warnings */}
+        <View style={styles.menuItem}>
+          <View style={styles.menuLeft}>
+            <View style={[styles.menuIcon, { backgroundColor: colors.warningSoft }]}>
+              <Ionicons name="alert-circle-outline" size={20} color={colors.warning} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text variant="bodyLarge" weight="semibold">
+                Budget Limit Alerts
+              </Text>
+              <Text variant="caption" color="secondary">
+                Instant warnings at 80% & 100% of limits
+              </Text>
+            </View>
+          </View>
+          <Switch
+            value={budgetAlertsEnabled}
+            onValueChange={handleToggleBudgetAlerts}
+            trackColor={{ false: colors.surfaceMuted, true: colors.primary }}
+            thumbColor="#FFFFFF"
+          />
+        </View>
+
+        <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+        {/* Send Test Notification */}
+        <TouchableOpacity
+          onPress={handleSendTestNotification}
+          activeOpacity={0.7}
+          disabled={isSendingTest}
+          style={styles.menuItem}
+        >
+          <View style={styles.menuLeft}>
+            <View style={[styles.menuIcon, { backgroundColor: colors.primaryLight }]}>
+              <Ionicons name="notifications-outline" size={20} color={colors.primary} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text variant="bodyLarge" weight="semibold">
+                Send Test Notification
+              </Text>
+              <Text variant="caption" color="secondary">
+                Tap to check notification delivery on your phone
+              </Text>
+            </View>
+          </View>
+          <Ionicons name="paper-plane-outline" size={18} color={colors.primary} />
         </TouchableOpacity>
       </Card>
 
@@ -283,7 +402,7 @@ const styles = StyleSheet.create({
   content: {
     paddingHorizontal: spacing.screenHorizontal,
     paddingTop: spacing.md,
-    paddingBottom: 115,
+    paddingBottom: 140,
     width: '100%',
     maxWidth: 540,
     alignSelf: 'center',

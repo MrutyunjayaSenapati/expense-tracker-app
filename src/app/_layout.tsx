@@ -3,9 +3,19 @@ import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import {
+  useFonts,
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+  Inter_800ExtraBold,
+} from '@expo-google-fonts/inter';
 import { Toast } from '../components/ui/Toast';
-import { colors } from '../theme/colors';
 import { useAuthStore } from '../store/useAuthStore';
+import { useTheme } from '../hooks/useTheme';
+import { notificationService } from '../services/notifications/notificationService';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -22,9 +32,11 @@ function ProtectedNavigation() {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   const isInitialized = useAuthStore(state => state.isInitialized);
   const initializeAuth = useAuthStore(state => state.initializeAuth);
+  const { colors } = useTheme();
 
   useEffect(() => {
     initializeAuth();
+    notificationService.init();
   }, [initializeAuth]);
 
   useEffect(() => {
@@ -127,15 +139,41 @@ function ProtectedNavigation() {
   );
 }
 
-export default function RootLayout() {
+function RootLayoutNav() {
+  const { isDark } = useTheme();
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <SafeAreaProvider>
-        <StatusBar style="dark" />
-        <Toast />
-        <ProtectedNavigation />
-      </SafeAreaProvider>
-    </QueryClientProvider>
+    <>
+      <StatusBar
+        style={isDark ? 'light' : 'dark'}
+      />
+      <Toast />
+      <ProtectedNavigation />
+    </>
+  );
+}
+
+export default function RootLayout() {
+  const [fontsLoaded] = useFonts({
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
+    Inter_700Bold,
+    Inter_800ExtraBold,
+  });
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <QueryClientProvider client={queryClient}>
+        <SafeAreaProvider>
+          <RootLayoutNav />
+        </SafeAreaProvider>
+      </QueryClientProvider>
+    </GestureHandlerRootView>
   );
 }
 

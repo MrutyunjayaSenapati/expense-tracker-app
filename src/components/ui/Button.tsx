@@ -39,6 +39,7 @@ export interface ButtonProps {
   style?: ViewStyle | ViewStyle[];
   textStyle?: TextStyle | TextStyle[];
   accessibilityLabel?: string;
+  testID?: string;
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -56,6 +57,7 @@ export const Button: React.FC<ButtonProps> = ({
   style,
   textStyle,
   accessibilityLabel,
+  testID,
 }) => {
   const isDisabled = disabled || loading || success;
 
@@ -180,6 +182,7 @@ export const Button: React.FC<ButtonProps> = ({
     <AnimatedPressable
       onPress={onPress}
       disabled={isDisabled}
+      testID={testID}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel || (typeof children === 'string' ? children : undefined)}
       accessibilityState={{ disabled: isDisabled, busy: loading }}

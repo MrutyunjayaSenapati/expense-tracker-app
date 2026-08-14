@@ -20,22 +20,20 @@ export interface TransactionFiltersSheetProps {
   onReset: () => void;
 }
 
-export const TransactionFiltersSheet: React.FC<TransactionFiltersSheetProps> = ({
-  visible,
-  onClose,
-  filters,
-  categories,
-  accounts,
-  onApply,
-  onReset,
-}) => {
+const FilterSheetBody: React.FC<{
+  filters: TransactionFilters;
+  categories: Category[];
+  accounts: Account[];
+  onApply: (filters: TransactionFilters) => void;
+  onReset: () => void;
+  onClose: () => void;
+}> = ({ filters, categories, accounts, onApply, onReset, onClose }) => {
   const [draftFilters, setDraftFilters] = useState<TransactionFilters>({ ...filters });
 
   const handleTypeChange = (type: 'expense' | 'income' | 'all') => {
     setDraftFilters(prev => ({
       ...prev,
       type,
-      // If type changed and current category belongs to another type, reset category
       categoryId: undefined,
     }));
   };
@@ -71,77 +69,113 @@ export const TransactionFiltersSheet: React.FC<TransactionFiltersSheetProps> = (
       : categories;
 
   return (
-    <BottomSheet visible={visible} onClose={onClose} title="Filter Transactions">
-      <ScrollView showsVerticalScrollIndicator={false} style={styles.container}>
-        {/* Transaction Type */}
-        <View style={styles.section}>
-          <Text variant="label" color="secondary" style={styles.sectionLabel}>
-            TYPE
-          </Text>
-          <SegmentedControl
-            options={[
-              { value: 'all', label: 'All' },
-              { value: 'expense', label: 'Expense' },
-              { value: 'income', label: 'Income' },
-            ]}
-            value={draftFilters.type || 'all'}
-            onChange={handleTypeChange}
-            semanticColoring={false}
-          />
-        </View>
+    <ScrollView showsVerticalScrollIndicator={false} style={styles.container}>
+      {/* Transaction Type */}
+      <View style={styles.section}>
+        <Text variant="label" color="secondary" style={styles.sectionLabel}>
+          TYPE
+        </Text>
+        <SegmentedControl
+          options={[
+            { value: 'all', label: 'All' },
+            { value: 'expense', label: 'Expense' },
+            { value: 'income', label: 'Income' },
+          ]}
+          value={draftFilters.type || 'all'}
+          onChange={handleTypeChange}
+          semanticColoring={false}
+        />
+      </View>
 
-        {/* Categories */}
-        <View style={styles.section}>
-          <Text variant="label" color="secondary" style={styles.sectionLabel}>
-            CATEGORY
-          </Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.chipRow}
-          >
-            {availableCategories.map(cat => (
+      {/* Categories */}
+      <View style={styles.section}>
+        <Text variant="label" color="secondary" style={styles.sectionLabel}>
+          CATEGORY
+        </Text>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.chipsContainer}
+        >
+          {availableCategories.map(cat => {
+            const isSelected = draftFilters.categoryId === cat.id;
+            return (
               <Chip
                 key={cat.id}
                 label={cat.name}
-                selected={draftFilters.categoryId === cat.id}
+                selected={isSelected}
                 onPress={() => toggleCategory(cat.id)}
               />
-            ))}
-          </ScrollView>
-        </View>
+            );
+          })}
+        </ScrollView>
+      </View>
 
-        {/* Accounts */}
-        <View style={styles.section}>
-          <Text variant="label" color="secondary" style={styles.sectionLabel}>
-            ACCOUNT
-          </Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.chipRow}
-          >
-            {accounts.map(acc => (
+      {/* Accounts */}
+      <View style={styles.section}>
+        <Text variant="label" color="secondary" style={styles.sectionLabel}>
+          ACCOUNT / WALLET
+        </Text>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.chipsContainer}
+        >
+          {accounts.map(acc => {
+            const isSelected = draftFilters.accountId === acc.id;
+            return (
               <Chip
                 key={acc.id}
                 label={acc.name}
-                selected={draftFilters.accountId === acc.id}
+                selected={isSelected}
                 onPress={() => toggleAccount(acc.id)}
               />
-            ))}
-          </ScrollView>
-        </View>
+            );
+          })}
+        </ScrollView>
+      </View>
 
-        {/* Action Buttons */}
-        <View style={styles.buttonRow}>
-          <Button variant="secondary" size="md" onPress={handleReset} style={styles.btn}>
-            Reset
-          </Button>
-          <Button variant="primary" size="md" onPress={handleApply} style={styles.btn}>
-            Apply Filters
-          </Button>
-        </View>
-      </ScrollView>
+      {/* Action Buttons */}
+      <View style={styles.actions}>
+        <Button variant="primary" size="lg" onPress={handleApply} fullWidth>
+          Apply Filters
+        </Button>
+        <Button
+          variant="ghost"
+          size="md"
+          onPress={handleReset}
+          fullWidth
+          style={styles.resetBtn}
+        >
+          Reset All Filters
+        </Button>
+      </View>
+    </ScrollView>
+  );
+};
+
+export const TransactionFiltersSheet: React.FC<TransactionFiltersSheetProps> = ({
+  visible,
+  onClose,
+  filters,
+  categories,
+  accounts,
+  onApply,
+  onReset,
+}) => {
+  return (
+    <BottomSheet visible={visible} onClose={onClose} title="Filter Transactions">
+      {visible && (
+        <FilterSheetBody
+          key={visible ? 'open' : 'closed'}
+          filters={filters}
+          categories={categories}
+          accounts={accounts}
+          onApply={onApply}
+          onReset={onReset}
+          onClose={onClose}
+        />
+      )}
     </BottomSheet>
   );
 };
@@ -154,18 +188,19 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   sectionLabel: {
-    marginBottom: spacing.xs,
+    marginBottom: spacing.xs + 2,
+    letterSpacing: 0.6,
   },
-  chipRow: {
+  chipsContainer: {
     paddingVertical: spacing.xs,
+    gap: spacing.xs,
   },
-  buttonRow: {
-    flexDirection: 'row',
-    gap: spacing.md,
+  actions: {
     marginTop: spacing.md,
-    marginBottom: spacing.lg,
+    marginBottom: spacing.xl,
+    gap: spacing.sm,
   },
-  btn: {
-    flex: 1,
+  resetBtn: {
+    marginTop: 2,
   },
 });

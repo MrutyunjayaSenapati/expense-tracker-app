@@ -1,12 +1,13 @@
 import React from 'react';
-import { View, ViewStyle, StyleProp } from 'react-native';
+import { View, ViewStyle, StyleProp, StyleSheet, Platform } from 'react-native';
+import { BlurView } from 'expo-blur';
 import { useTheme } from '../../hooks/useTheme';
 import { radius } from '../../theme/radius';
 import { spacing } from '../../theme/spacing';
 import { shadows, Shadows } from '../../theme/shadows';
 import { AnimatedPressable } from './AnimatedPressable';
 
-export type CardVariant = 'solid' | 'flat' | 'glass' | 'subtle' | 'elevated';
+export type CardVariant = 'solid' | 'flat' | 'glass' | 'subtle' | 'elevated' | 'glow';
 
 export interface CardProps {
   children: React.ReactNode;
@@ -17,6 +18,7 @@ export interface CardProps {
   padding?: keyof typeof spacing | number;
   borderRadius?: number;
   accessibilityLabel?: string;
+  testID?: string;
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -28,8 +30,9 @@ export const Card: React.FC<CardProps> = ({
   padding = 'lg',
   borderRadius = radius.card,
   accessibilityLabel,
+  testID,
 }) => {
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   const paddingValue = typeof padding === 'number' ? padding : spacing[padding];
 
   const getVariantStyle = (): ViewStyle => {
@@ -39,6 +42,7 @@ export const Card: React.FC<CardProps> = ({
           backgroundColor: colors.surface,
           borderWidth: 1,
           borderColor: colors.border,
+          borderTopColor: isDark ? 'rgba(255, 255, 255, 0.16)' : colors.border,
           ...shadows[elevation],
         };
       case 'elevated':
@@ -46,6 +50,7 @@ export const Card: React.FC<CardProps> = ({
           backgroundColor: colors.surfaceElevated,
           borderWidth: 1,
           borderColor: colors.borderStrong,
+          borderTopColor: isDark ? 'rgba(255, 255, 255, 0.22)' : colors.borderStrong,
           ...shadows.md,
         };
       case 'flat':
@@ -61,10 +66,20 @@ export const Card: React.FC<CardProps> = ({
         };
       case 'glass':
         return {
-          backgroundColor: colors.glassSurface,
+          backgroundColor: isDark ? 'rgba(19, 21, 31, 0.65)' : 'rgba(255, 255, 255, 0.78)',
           borderWidth: 1,
-          borderColor: colors.glassBorder,
+          borderColor: isDark ? 'rgba(255, 255, 255, 0.10)' : 'rgba(255, 255, 255, 0.6)',
+          borderTopColor: isDark ? 'rgba(255, 255, 255, 0.24)' : 'rgba(255, 255, 255, 0.9)',
+          borderBottomColor: isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.06)',
           ...shadows.glass,
+        };
+      case 'glow':
+        return {
+          backgroundColor: colors.surface,
+          borderWidth: 1,
+          borderColor: colors.primary,
+          borderTopColor: colors.primaryLight,
+          ...shadows.sm,
         };
     }
   };
@@ -72,22 +87,42 @@ export const Card: React.FC<CardProps> = ({
   const cardStyle: ViewStyle = {
     borderRadius,
     padding: paddingValue,
+    overflow: 'hidden',
+    position: 'relative',
     ...getVariantStyle(),
   };
+
+  const content = (
+    <>
+      {variant === 'glass' && Platform.OS !== 'web' && (
+        <BlurView
+          intensity={isDark ? 40 : 65}
+          tint={isDark ? 'dark' : 'light'}
+          style={StyleSheet.absoluteFill}
+        />
+      )}
+      {children}
+    </>
+  );
 
   if (onPress) {
     return (
       <AnimatedPressable
         onPress={onPress}
         scaleTo={0.98}
+        testID={testID}
         accessibilityRole="button"
         accessibilityLabel={accessibilityLabel}
         style={[cardStyle, style]}
       >
-        {children}
+        {content}
       </AnimatedPressable>
     );
   }
 
-  return <View style={[cardStyle, style]}>{children}</View>;
+  return (
+    <View style={[cardStyle, style]} testID={testID}>
+      {content}
+    </View>
+  );
 };

@@ -13,6 +13,7 @@ export interface AnimatedNumberProps {
   type?: 'expense' | 'income';
   style?: TextStyle | TextStyle[];
   duration?: number;
+  testID?: string;
 }
 
 export const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
@@ -24,6 +25,7 @@ export const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
   type,
   style,
   duration = 600,
+  testID,
 }) => {
   const [displayValue, setDisplayValue] = useState(value);
   const prevValueRef = useRef(value);
@@ -62,7 +64,7 @@ export const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
   const formatted = formatCurrency(displayValue, { sign, type });
 
   return (
-    <Text variant={variant} weight={weight} color={color} style={style}>
+    <Text variant={variant} weight={weight} color={color} style={style} testID={testID}>
       {formatted}
     </Text>
   );

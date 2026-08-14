@@ -17,3 +17,5 @@ export * from './Toast';
 export * from './AnimatedPressable';
 export * from './AnimatedNumber';
 export * from './Icon';
+export * from './LottieAnimation';
+export * from './SwipeableRow';

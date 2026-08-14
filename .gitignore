@@ -46,6 +46,10 @@ yarn-error.*
 
 example
 
+# logs
+*.log
+metro.log
+
 # generated native folders
 /ios
 /android

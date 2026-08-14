@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { colors } from '../../theme/colors';
+import { useTheme } from '../../hooks/useTheme';
 import { spacing } from '../../theme/spacing';
 import { radius } from '../../theme/radius';
 import { Text } from '../../components/ui/Text';
@@ -11,14 +11,15 @@ import { Ionicons } from '@expo/vector-icons';
 
 export default function OnboardingScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <View style={styles.container}>
         {/* Hero Visual */}
         <View style={styles.heroSection}>
-          <View style={styles.logoCircle}>
-            <Ionicons name="wallet" size={48} color={colors.textInverse} />
+          <View style={[styles.logoCircle, { backgroundColor: colors.primary, shadowColor: colors.primary }]}>
+            <Ionicons name="wallet" size={48} color="#FFFFFF" />
           </View>
           <Text variant="display" weight="bold" align="center" style={styles.heroTitle}>
             Take Control of Your Expenses
@@ -93,7 +94,6 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.surface,
   },
   container: {
     flex: 1,
@@ -109,11 +109,9 @@ const styles = StyleSheet.create({
     width: 88,
     height: 88,
     borderRadius: 44,
-    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: spacing.xl,
-    shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.3,
     shadowRadius: 12,

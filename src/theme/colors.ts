@@ -12,7 +12,7 @@ export interface ThemeColors {
   surfaceMuted: string;
   surfaceSubtle: string;
 
-  // Selective Liquid Glass
+  // Selective Glass Surfaces
   glassSurface: string;
   glassSurfaceSubtle: string;
   glassBorder: string;
@@ -20,15 +20,13 @@ export interface ThemeColors {
   glassHighlight: string;
   glassBackdrop: string;
 
-  // Hero Card Gradient
-  heroGradientStart: string;
-  heroGradientEnd: string;
-  heroSparkline: string;
-  heroSparklineGlow: string;
-  heroDot: string;
+  // Hero Card Palette
+  heroBackground: string;
+  heroBorder: string;
+  heroTextPrimary: string;
   heroTextSecondary: string;
 
-  // Text
+  // Text Hierarchy
   textPrimary: string;
   textSecondary: string;
   textTertiary: string;
@@ -55,11 +53,12 @@ export interface ThemeColors {
   error: string;
   errorSoft: string;
 
-  // Borders
+  // Borders & Dividers
   border: string;
   borderStrong: string;
+  divider: string;
 
-  // Gamification & Habit Badges
+  // Habit & Badges
   streakOrange: string;
   streakSoft: string;
   trophyGold: string;
@@ -69,7 +68,7 @@ export interface ThemeColors {
   overlay: string;
   backdrop: string;
 
-  // Category Icon Colors
+  // Category Icon Colors (Curated Harmonic Palette)
   categoryColors: {
     food: string;
     groceries: string;
@@ -91,155 +90,153 @@ export interface ThemeColors {
 }
 
 export const lightPalette: ThemeColors = {
-  primary: '#5B5CE2',
-  primaryDark: '#4647B8',
-  primaryLight: '#EEF0FF',
-  primaryGlow: 'rgba(91, 92, 226, 0.25)',
+  primary: '#4F46E5', // Rich Indigo
+  primaryDark: '#4338CA',
+  primaryLight: '#EEF2FF',
+  primaryGlow: 'rgba(79, 70, 229, 0.16)',
 
-  background: '#F5F7FB',
+  background: '#F8F9FA', // Clean modern off-white
   surface: '#FFFFFF',
   surfaceElevated: '#FFFFFF',
-  surfaceMuted: '#F1F3F8',
-  surfaceSubtle: '#FAFAFD',
+  surfaceMuted: '#F1F3F9',
+  surfaceSubtle: '#F8FAFC',
 
-  glassSurface: 'rgba(255, 255, 255, 0.85)',
-  glassSurfaceSubtle: 'rgba(255, 255, 255, 0.65)',
-  glassBorder: 'rgba(255, 255, 255, 0.6)',
-  glassBorderDark: 'rgba(23, 24, 28, 0.06)',
+  glassSurface: 'rgba(255, 255, 255, 0.90)',
+  glassSurfaceSubtle: 'rgba(255, 255, 255, 0.70)',
+  glassBorder: 'rgba(229, 231, 235, 0.8)',
+  glassBorderDark: 'rgba(15, 23, 42, 0.06)',
   glassHighlight: 'rgba(255, 255, 255, 0.95)',
-  glassBackdrop: 'rgba(15, 18, 30, 0.35)',
+  glassBackdrop: 'rgba(15, 23, 42, 0.35)',
 
-  heroGradientStart: '#4F46E5',
-  heroGradientEnd: '#7C3AED',
-  heroSparkline: '#38BDF8',
-  heroSparklineGlow: 'rgba(56, 189, 248, 0.4)',
-  heroDot: '#22D3EE',
-  heroTextSecondary: 'rgba(255, 255, 255, 0.78)',
+  heroBackground: '#1E1B4B', // Deep indigo/slate hero card
+  heroBorder: 'rgba(255, 255, 255, 0.12)',
+  heroTextPrimary: '#FFFFFF',
+  heroTextSecondary: 'rgba(255, 255, 255, 0.72)',
 
-  textPrimary: '#111827',
-  textSecondary: '#64748B',
-  textTertiary: '#94A3B8',
-  textDisabled: '#CBD5E1',
+  textPrimary: '#0F172A', // Slate 900
+  textSecondary: '#475569', // Slate 600
+  textTertiary: '#94A3B8', // Slate 400
+  textDisabled: '#CBD5E1', // Slate 300
   textInverse: '#FFFFFF',
 
-  expense: '#EF4444',
-  expenseSoft: '#FEE2E2',
-  expenseGlow: 'rgba(239, 68, 68, 0.2)',
-  income: '#10B981',
+  expense: '#E11D48', // Rose 600
+  expenseSoft: '#FFE4E6',
+  expenseGlow: 'rgba(225, 29, 72, 0.12)',
+  income: '#059669', // Emerald 600
   incomeSoft: '#D1FAE5',
-  incomeGlow: 'rgba(16, 185, 129, 0.2)',
-  savings: '#3B82F6',
+  incomeGlow: 'rgba(5, 150, 105, 0.12)',
+  savings: '#2563EB', // Blue 600
   savingsSoft: '#DBEAFE',
-  savingsGlow: 'rgba(59, 130, 246, 0.2)',
-  warning: '#F59E0B',
+  savingsGlow: 'rgba(37, 99, 235, 0.12)',
+  warning: '#D97706', // Amber 600
   warningSoft: '#FEF3C7',
-  warningGlow: 'rgba(245, 158, 11, 0.2)',
-  info: '#6366F1',
+  warningGlow: 'rgba(217, 119, 6, 0.12)',
+  info: '#4F46E5',
   infoSoft: '#EEF2FF',
-  success: '#10B981',
+  success: '#059669',
   successSoft: '#D1FAE5',
-  error: '#EF4444',
-  errorSoft: '#FEE2E2',
+  error: '#E11D48',
+  errorSoft: '#FFE4E6',
 
   border: '#E2E8F0',
   borderStrong: '#CBD5E1',
+  divider: '#F1F5F9',
 
-  streakOrange: '#FF7A00',
-  streakSoft: '#FFF3E6',
-  trophyGold: '#F59E0B',
+  streakOrange: '#EA580C',
+  streakSoft: '#FFEDD5',
+  trophyGold: '#D97706',
   trophySoft: '#FEF3C7',
 
-  overlay: 'rgba(15, 23, 42, 0.4)',
-  backdrop: 'rgba(15, 23, 42, 0.6)',
+  overlay: 'rgba(15, 23, 42, 0.45)',
+  backdrop: 'rgba(15, 23, 42, 0.65)',
 
   categoryColors: {
-    food: '#FF7A00',
-    groceries: '#10B981',
-    shopping: '#8B5CF6',
-    travel: '#3B82F6',
-    bills: '#EF4444',
-    entertainment: '#EC4899',
-    health: '#14B8A6',
-    education: '#6366F1',
-    rent: '#F59E0B',
-    subscriptions: '#06B6D4',
-    personal: '#0EA5E9',
-    salary: '#10B981',
-    freelance: '#14B8A6',
-    investment: '#3B82F6',
-    gift: '#F43F5E',
+    food: '#EA580C',
+    groceries: '#059669',
+    shopping: '#7C3AED',
+    travel: '#0284C7',
+    bills: '#E11D48',
+    entertainment: '#DB2777',
+    health: '#0D9488',
+    education: '#4F46E5',
+    rent: '#D97706',
+    subscriptions: '#0891B2',
+    personal: '#2563EB',
+    salary: '#059669',
+    freelance: '#0D9488',
+    investment: '#2563EB',
+    gift: '#E11D48',
     other: '#64748B',
   },
 };
 
 export const darkPalette: ThemeColors = {
-  primary: '#6366F1',
+  primary: '#6366F1', // Indigo 500
   primaryDark: '#4F46E5',
-  primaryLight: '#312E81',
-  primaryGlow: 'rgba(99, 102, 241, 0.35)',
+  primaryLight: 'rgba(99, 102, 241, 0.18)',
+  primaryGlow: 'rgba(99, 102, 241, 0.25)',
 
-  background: '#0B0D17',
-  surface: '#151928',
-  surfaceElevated: '#1E2337',
-  surfaceMuted: '#1A1E30',
-  surfaceSubtle: '#121522',
+  background: '#090A0F', // Deep obsidian
+  surface: 'rgba(19, 21, 31, 0.76)', // Frosted glass surface
+  surfaceElevated: 'rgba(26, 30, 46, 0.86)',
+  surfaceMuted: 'rgba(255, 255, 255, 0.08)',
+  surfaceSubtle: 'rgba(255, 255, 255, 0.05)',
 
-  glassSurface: 'rgba(22, 25, 40, 0.85)',
-  glassSurfaceSubtle: 'rgba(22, 25, 40, 0.65)',
-  glassBorder: 'rgba(255, 255, 255, 0.08)',
-  glassBorderDark: 'rgba(0, 0, 0, 0.3)',
-  glassHighlight: 'rgba(255, 255, 255, 0.15)',
-  glassBackdrop: 'rgba(5, 7, 12, 0.65)',
+  glassSurface: 'rgba(19, 21, 31, 0.62)',
+  glassSurfaceSubtle: 'rgba(255, 255, 255, 0.04)',
+  glassBorder: 'rgba(255, 255, 255, 0.12)',
+  glassBorderDark: 'rgba(0, 0, 0, 0.40)',
+  glassHighlight: 'rgba(255, 255, 255, 0.20)',
+  glassBackdrop: 'rgba(9, 10, 15, 0.60)',
 
-  heroGradientStart: '#1E1B4B',
-  heroGradientEnd: '#311042',
-  heroSparkline: '#818CF8',
-  heroSparklineGlow: 'rgba(129, 140, 248, 0.5)',
-  heroDot: '#A5B4FC',
-  heroTextSecondary: 'rgba(226, 232, 240, 0.75)',
+  heroBackground: 'rgba(24, 27, 44, 0.82)',
+  heroBorder: 'rgba(255, 255, 255, 0.15)',
+  heroTextPrimary: '#FFFFFF',
+  heroTextSecondary: 'rgba(255, 255, 255, 0.76)',
 
-  textPrimary: '#F8FAFC',
-  textSecondary: '#94A3B8',
-  textTertiary: '#64748B',
-  textDisabled: '#475569',
-  textInverse: '#0B0D17',
+  textPrimary: '#F8FAFC', // Slate 50
+  textSecondary: '#CBD5E1', // Slate 300 (Crisp contrast)
+  textTertiary: '#94A3B8', // Slate 400
+  textDisabled: '#475569', // Slate 600
+  textInverse: '#0F172A',
 
-  expense: '#F87171',
-  expenseSoft: 'rgba(239, 68, 68, 0.15)',
-  expenseGlow: 'rgba(248, 113, 113, 0.3)',
-  income: '#34D399',
-  incomeSoft: 'rgba(16, 185, 129, 0.15)',
-  incomeGlow: 'rgba(52, 211, 153, 0.3)',
-  savings: '#60A5FA',
-  savingsSoft: 'rgba(59, 130, 246, 0.15)',
-  savingsGlow: 'rgba(96, 165, 250, 0.3)',
-  warning: '#FBBF24',
-  warningSoft: 'rgba(245, 158, 11, 0.15)',
-  warningGlow: 'rgba(251, 191, 36, 0.3)',
+  expense: '#FB7185', // Rose 400 (soft, readable)
+  expenseSoft: 'rgba(251, 113, 133, 0.14)',
+  expenseGlow: 'rgba(251, 113, 133, 0.2)',
+  income: '#34D399', // Emerald 400
+  incomeSoft: 'rgba(52, 211, 153, 0.14)',
+  incomeGlow: 'rgba(52, 211, 153, 0.2)',
+  savings: '#60A5FA', // Blue 400
+  savingsSoft: 'rgba(96, 165, 250, 0.14)',
+  savingsGlow: 'rgba(96, 165, 250, 0.2)',
+  warning: '#FBBF24', // Amber 400
+  warningSoft: 'rgba(251, 191, 36, 0.14)',
+  warningGlow: 'rgba(251, 191, 36, 0.2)',
   info: '#818CF8',
-  infoSoft: 'rgba(99, 102, 241, 0.15)',
+  infoSoft: 'rgba(129, 140, 248, 0.14)',
   success: '#34D399',
-  successSoft: 'rgba(16, 185, 129, 0.15)',
-  error: '#F87171',
-  errorSoft: 'rgba(239, 68, 68, 0.15)',
+  successSoft: 'rgba(52, 211, 153, 0.14)',
+  error: '#FB7185',
+  errorSoft: 'rgba(251, 113, 133, 0.14)',
 
   border: 'rgba(255, 255, 255, 0.08)',
   borderStrong: 'rgba(255, 255, 255, 0.14)',
+  divider: 'rgba(255, 255, 255, 0.05)',
 
   streakOrange: '#FB923C',
-  streakSoft: 'rgba(251, 146, 60, 0.15)',
+  streakSoft: 'rgba(251, 146, 60, 0.14)',
   trophyGold: '#FBBF24',
-  trophySoft: 'rgba(251, 191, 36, 0.15)',
+  trophySoft: 'rgba(251, 191, 36, 0.14)',
 
-  overlay: 'rgba(0, 0, 0, 0.7)',
-  backdrop: 'rgba(0, 0, 0, 0.8)',
+  overlay: 'rgba(0, 0, 0, 0.75)',
+  backdrop: 'rgba(0, 0, 0, 0.85)',
 
   categoryColors: {
     food: '#FB923C',
     groceries: '#34D399',
     shopping: '#A78BFA',
     travel: '#60A5FA',
-    bills: '#F87171',
+    bills: '#FB7185',
     entertainment: '#F472B6',
     health: '#2DD4BF',
     education: '#818CF8',

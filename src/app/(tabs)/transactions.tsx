@@ -12,6 +12,7 @@ import { radius } from '../../theme/radius';
 import { Text } from '../../components/ui/Text';
 import { Input } from '../../components/ui/Input';
 import { Chip } from '../../components/ui/Chip';
+import { AmbientMeshBackground } from '../../components/ui/AmbientMeshBackground';
 import { TransactionList } from '../../features/transactions/components/TransactionList';
 import { TransactionFiltersSheet } from '../../features/transactions/components/TransactionFiltersSheet';
 import { Ionicons } from '@expo/vector-icons';
@@ -51,21 +52,17 @@ export default function TransactionsScreen() {
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-      <View style={styles.container}>
-        {/* Screen Header */}
-        <View style={styles.header}>
-          <Text variant="headingL" weight="bold">
-            Transactions
-          </Text>
-          <TouchableOpacity
-            onPress={() => router.push('/(tabs)/add')}
-            activeOpacity={0.8}
-            style={[styles.addIconBtn, { backgroundColor: colors.primary }]}
-            accessibilityLabel="Add transaction"
-          >
-            <Ionicons name="add" size={22} color="#FFFFFF" />
-          </TouchableOpacity>
-        </View>
+      <AmbientMeshBackground>
+        <View style={styles.container}>
+          {/* Screen Header */}
+          <View style={styles.header}>
+            <Text variant="headingL" weight="bold">
+              Transactions
+            </Text>
+            <Text variant="caption" color="secondary">
+              {`${transactions.length} recorded`}
+            </Text>
+          </View>
 
         {/* Search Bar & Filter Button Row */}
         <View style={styles.searchFilterRow}>
@@ -74,7 +71,7 @@ export default function TransactionsScreen() {
               placeholder="Search merchants, notes..."
               value={searchQuery}
               onChangeText={setSearchQuery}
-              leftIcon={<Ionicons name="search" size={18} color={colors.textTertiary} />}
+              leftIcon={<Ionicons name="search" size={17} color={colors.textTertiary} />}
               clearable
               onClear={() => setSearchQuery('')}
               containerStyle={styles.searchInput}
@@ -94,22 +91,84 @@ export default function TransactionsScreen() {
           >
             <Ionicons
               name="filter"
-              size={20}
+              size={18}
               color={hasActiveFilters ? '#FFFFFF' : colors.primary}
             />
           </TouchableOpacity>
         </View>
 
+        {/* Quick Type Pills (All | Expense | Income) */}
+        <View style={styles.quickTypeRow}>
+          <TouchableOpacity
+            onPress={() => setFilters({ ...filters, type: 'all' })}
+            style={[
+              styles.quickPill,
+              { backgroundColor: colors.surface, borderColor: colors.border },
+              (!filters.type || filters.type === 'all') && {
+                backgroundColor: colors.primary,
+                borderColor: colors.primary,
+              },
+            ]}
+          >
+            <Text
+              variant="caption"
+              weight="bold"
+              style={{
+                color: !filters.type || filters.type === 'all' ? '#FFFFFF' : colors.textSecondary,
+              }}
+            >
+              All
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => setFilters({ ...filters, type: 'expense' })}
+            style={[
+              styles.quickPill,
+              { backgroundColor: colors.surface, borderColor: colors.border },
+              filters.type === 'expense' && {
+                backgroundColor: colors.expense,
+                borderColor: colors.expense,
+              },
+            ]}
+          >
+            <Text
+              variant="caption"
+              weight="bold"
+              style={{
+                color: filters.type === 'expense' ? '#FFFFFF' : colors.textSecondary,
+              }}
+            >
+              Expenses
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => setFilters({ ...filters, type: 'income' })}
+            style={[
+              styles.quickPill,
+              { backgroundColor: colors.surface, borderColor: colors.border },
+              filters.type === 'income' && {
+                backgroundColor: colors.income,
+                borderColor: colors.income,
+              },
+            ]}
+          >
+            <Text
+              variant="caption"
+              weight="bold"
+              style={{
+                color: filters.type === 'income' ? '#FFFFFF' : colors.textSecondary,
+              }}
+            >
+              Income
+            </Text>
+          </TouchableOpacity>
+        </View>
+
         {/* Active Filter Chips Bar */}
-        {hasActiveFilters && (
+        {(activeCategory || activeAccount) && (
           <View style={styles.activeChipsRow}>
-            {filters.type && filters.type !== 'all' && (
-              <Chip
-                label={filters.type.toUpperCase()}
-                selected
-                onPress={() => setFilters({ ...filters, type: 'all' })}
-              />
-            )}
             {activeCategory && (
               <Chip
                 label={activeCategory.name}
@@ -132,7 +191,7 @@ export default function TransactionsScreen() {
               style={styles.clearAllBtn}
             >
               <Text variant="caption" weight="bold" color="expense">
-                Clear All
+                Clear Filters
               </Text>
             </TouchableOpacity>
           </View>
@@ -165,7 +224,8 @@ export default function TransactionsScreen() {
           onApply={setFilters}
           onReset={resetFilters}
         />
-      </View>
+        </View>
+      </AmbientMeshBackground>
     </SafeAreaView>
   );
 }
@@ -183,16 +243,9 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'baseline',
     justifyContent: 'space-between',
-    paddingVertical: spacing.md,
-  },
-  addIconBtn: {
-    width: 38,
-    height: 38,
-    borderRadius: radius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingVertical: spacing.sm,
   },
   searchFilterRow: {
     flexDirection: 'row',
@@ -207,12 +260,23 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   filterBtn: {
-    width: 50,
-    height: 50,
+    width: 46,
+    height: 46,
     borderRadius: radius.input,
-    borderWidth: 1.5,
+    borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  quickTypeRow: {
+    flexDirection: 'row',
+    gap: spacing.xs + 2,
+    marginVertical: spacing.xs,
+  },
+  quickPill: {
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: radius.full,
+    borderWidth: 1,
   },
   activeChipsRow: {
     flexDirection: 'row',
@@ -220,7 +284,6 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: spacing.xs,
     paddingVertical: spacing.xs,
-    marginBottom: spacing.xs,
   },
   clearAllBtn: {
     paddingHorizontal: spacing.sm,

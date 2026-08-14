@@ -7,8 +7,10 @@ import { Account } from '../../../types/account';
 import { spacing } from '../../../theme/spacing';
 import { Text } from '../../../components/ui/Text';
 import { Card } from '../../../components/ui/Card';
+import { EmptyState } from '../../../components/ui/EmptyState';
 import { TransactionRow } from '../../transactions/components/TransactionRow';
 import { Ionicons } from '@expo/vector-icons';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 export interface RecentTransactionsSectionProps {
   transactions: Transaction[];
@@ -25,11 +27,32 @@ export const RecentTransactionsSection: React.FC<RecentTransactionsSectionProps>
   accounts,
   onSeeAll,
   onSelectTransaction,
+  onAddTransaction,
 }) => {
   const { colors } = useTheme();
 
   const categoryMap = new Map(categories.map(c => [c.id, c]));
   const accountMap = new Map(accounts.map(a => [a.id, a]));
+
+  if (transactions.length === 0) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Text variant="headingS" weight="bold">
+            Recent Transactions
+          </Text>
+        </View>
+        <Card variant="solid" elevation="sm" style={styles.emptyCard}>
+          <EmptyState
+            title="No transactions yet"
+            message="Add your first expense or income to begin tracking your cash flow."
+            actionLabel="Add Transaction"
+            onAction={onAddTransaction}
+          />
+        </Card>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -53,8 +76,11 @@ export const RecentTransactionsSection: React.FC<RecentTransactionsSectionProps>
 
       {/* Transaction Items */}
       <Card variant="solid" elevation="sm" padding={0} style={styles.listCard}>
-        {transactions.slice(0, 4).map((txn, index) => (
-          <View key={txn.id}>
+        {transactions.slice(0, 5).map((txn, index) => (
+          <Animated.View
+            key={txn.id}
+            entering={FadeInDown.delay(index * 60).duration(400).springify()}
+          >
             <TransactionRow
               transaction={txn}
               category={categoryMap.get(txn.categoryId)}
@@ -62,10 +88,10 @@ export const RecentTransactionsSection: React.FC<RecentTransactionsSectionProps>
               onPress={() => onSelectTransaction(txn.id)}
               style={styles.rowStyle}
             />
-            {index < Math.min(transactions.length, 4) - 1 && (
+            {index < Math.min(transactions.length, 5) - 1 && (
               <View style={[styles.separator, { backgroundColor: colors.border }]} />
             )}
-          </View>
+          </Animated.View>
         ))}
       </Card>
     </View>
@@ -88,6 +114,9 @@ const styles = StyleSheet.create({
   },
   listCard: {
     overflow: 'hidden',
+  },
+  emptyCard: {
+    paddingVertical: spacing.md,
   },
   rowStyle: {
     paddingHorizontal: spacing.md,

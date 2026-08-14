@@ -44,8 +44,8 @@ export const SpendingByCategoryCard: React.FC<SpendingByCategoryCardProps> = ({
       <DonutChart
         categories={categories}
         totalSpent={totalSpent}
-        size={135}
-        strokeWidth={22}
+        size={110}
+        strokeWidth={12}
       />
     </Card>
   );

@@ -31,11 +31,11 @@ export const MonthlyBudgetCard: React.FC<MonthlyBudgetCardProps> = ({
   const getStatusBadge = () => {
     switch (status) {
       case 'healthy':
-        return { label: '● Healthy', color: colors.income, bg: colors.incomeSoft };
+        return { label: 'Healthy', color: colors.income, bg: colors.incomeSoft };
       case 'warning':
-        return { label: '● Near Limit', color: colors.warning, bg: colors.warningSoft };
+        return { label: 'Near Limit', color: colors.warning, bg: colors.warningSoft };
       case 'exceeded':
-        return { label: '● Over Budget', color: colors.expense, bg: colors.expenseSoft };
+        return { label: 'Over Budget', color: colors.expense, bg: colors.expenseSoft };
     }
   };
 
@@ -57,7 +57,7 @@ export const MonthlyBudgetCard: React.FC<MonthlyBudgetCardProps> = ({
 
       {/* Amount line: ₹33,600 of ₹45,000 */}
       <View style={styles.amountRow}>
-        <Text variant="bodyLarge" weight="bold">
+        <Text variant="headingM" weight="bold" color="primary">
           {formatCurrency(monthlyBudgetSpent)}
         </Text>
         <Text variant="bodySmall" color="secondary">
@@ -68,7 +68,7 @@ export const MonthlyBudgetCard: React.FC<MonthlyBudgetCardProps> = ({
       {/* Progress Bar */}
       <ProgressBar
         progress={monthlyBudget > 0 ? monthlyBudgetSpent / monthlyBudget : 0}
-        height={8}
+        height={7}
         style={styles.progressBar}
       />
 
@@ -80,10 +80,10 @@ export const MonthlyBudgetCard: React.FC<MonthlyBudgetCardProps> = ({
         <Text
           variant="caption"
           weight="semibold"
-          color={isOver ? 'expense' : 'secondary'}
+          color={isOver ? 'expense' : 'income'}
         >
           {isOver
-            ? `${formatCurrency(Math.abs(remaining))} over`
+            ? `${formatCurrency(Math.abs(remaining))} over budget`
             : `${formatCurrency(remaining)} remaining`}
         </Text>
       </View>
@@ -99,25 +99,25 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 4,
+    marginBottom: spacing.xs,
   },
   statusPill: {
-    paddingHorizontal: spacing.sm + 2,
+    paddingHorizontal: spacing.sm,
     paddingVertical: 3,
     borderRadius: radius.full,
   },
   amountRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    marginBottom: spacing.xs,
+    marginVertical: 2,
   },
   progressBar: {
-    marginVertical: spacing.xs,
+    marginVertical: spacing.xs + 2,
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: spacing.xs,
+    marginTop: 2,
   },
 });

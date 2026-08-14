@@ -13,6 +13,8 @@ import {
 import { useAppStore } from '../store/useAppStore';
 import { useAuthStore } from '../store/useAuthStore';
 
+import { notificationService } from '../services/notifications/notificationService';
+
 export function useTransactions(
   filters?: TransactionFilters,
   sort: TransactionSort = 'date_desc'
@@ -52,10 +54,27 @@ export function useCreateTransaction() {
         // Balance is updated automatically by backend database trigger
       }
 
-      // If expense, adjust budget spent
+      // If expense, adjust budget spent and evaluate alert threshold
       if (input.type === 'expense') {
         try {
           await budgetRepository.updateSpent(input.categoryId, input.amount);
+          const { budgetAlertsEnabled } = useAppStore.getState();
+          if (budgetAlertsEnabled) {
+            const budgets = queryClient.getQueryData<any[]>(['budgets']);
+            const budget = budgets?.find(b => b.categoryId === input.categoryId);
+            if (budget && budget.amount > 0) {
+              const newSpent = budget.spent + input.amount;
+              const pct = Math.round((newSpent / budget.amount) * 100);
+              if (pct >= 80) {
+                await notificationService.sendBudgetAlert({
+                  categoryName: budget.name || 'Category',
+                  spent: newSpent,
+                  limit: budget.amount,
+                  percentage: pct,
+                });
+              }
+            }
+          }
         } catch {
           // Ignore
         }

@@ -1,0 +1,29 @@
+appId: com.mrnobody007.expensetracker
+name: Connect Dev Build to Local Metro Server
+tags:
+  - dev
+  - setup
+---
+# Connects the Expo development build to a locally running Metro server.
+# Prerequisites:
+#   1. npx expo start  (running on port 8081)
+#   2. adb reverse tcp:8081 tcp:8081  (for USB-connected devices)
+#
+# Run this flow when the Dev Launcher is showing instead of the app.
+
+- launchApp
+- extendedWaitUntil:
+    visible: "Development Build"
+    timeout: 15000
+- tapOn:
+    text: "http://"
+- eraseText: 10
+- inputText: "http://localhost:8081"
+- hideKeyboard
+- tapOn:
+    text: "Connect"
+    optional: true
+- extendedWaitUntil:
+    notVisible: "Development Build"
+    timeout: 90000
+- assertVisible: "TOTAL NET BALANCE"

@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useMemo } from 'react';
+import { View, StyleSheet, TouchableOpacity, useWindowDimensions } from 'react-native';
+import { useTheme } from '../../../hooks/useTheme';
 import { spacing } from '../../../theme/spacing';
 import { radius } from '../../../theme/radius';
 import { Text } from '../../../components/ui/Text';
 import { AnimatedNumber } from '../../../components/ui/AnimatedNumber';
-import { SparklineGraph } from '../../../components/ui/SparklineGraph';
+import { InteractiveTrendGraph, TrendDataPoint } from '../../../components/ui/InteractiveTrendGraph';
 import { formatCurrency } from '../../../utils/currency';
+import { useHaptics } from '../../../hooks/useHaptics';
 import { Ionicons } from '@expo/vector-icons';
 
 export interface FinancialSummaryCardProps {
@@ -18,79 +20,158 @@ export interface FinancialSummaryCardProps {
 export const FinancialSummaryCard: React.FC<FinancialSummaryCardProps> = ({
   totalBalance,
   netSavings,
+  onAddExpense,
+  onViewAccounts,
 }) => {
   const [isBalanceHidden, setIsBalanceHidden] = useState(false);
+  const [scrubbedPoint, setScrubbedPoint] = useState<TrendDataPoint | null>(null);
+  const { colors } = useTheme();
+  const haptics = useHaptics();
+  const { width } = useWindowDimensions();
 
-  const savingsRate =
-    totalBalance > 0
-      ? Math.min(100, Math.max(0, Math.round((netSavings / totalBalance) * 100)))
-      : 0;
+  const isPositiveSavings = netSavings >= 0;
+
+  // Responsive graph width
+  const graphWidth = Math.min(width - spacing.screenHorizontal * 2 - spacing.lg * 2, 460);
+
+  // Generate smooth 7-day trend trajectory culminating in totalBalance
+  const trendData: TrendDataPoint[] = useMemo(() => {
+    const base = totalBalance - netSavings;
+    return [
+      { label: '8 Aug', value: Math.max(0, base) },
+      { label: '9 Aug', value: Math.max(0, base + netSavings * 0.2) },
+      { label: '10 Aug', value: Math.max(0, base + netSavings * 0.45) },
+      { label: '11 Aug', value: Math.max(0, base + netSavings * 0.35) },
+      { label: '12 Aug', value: Math.max(0, base + netSavings * 0.7) },
+      { label: '13 Aug', value: Math.max(0, base + netSavings * 0.85) },
+      { label: 'Today', value: totalBalance },
+    ];
+  }, [totalBalance, netSavings]);
+
+  const toggleVisibility = () => {
+    haptics.light();
+    setIsBalanceHidden(prev => !prev);
+  };
+
+  const displayedAmount = scrubbedPoint ? scrubbedPoint.value : totalBalance;
 
   return (
-    <View style={styles.cardContainer}>
+    <View style={[styles.cardContainer, { backgroundColor: colors.heroBackground, borderColor: colors.heroBorder }]}>
       {/* Top row: Label & Eye Toggle */}
       <View style={styles.topRow}>
-        <Text variant="caption" weight="medium" style={styles.label}>
-          TOTAL NET BALANCE
-        </Text>
+        <View style={styles.labelContainer}>
+          <Text variant="captionBold" style={styles.label}>
+            {scrubbedPoint ? `BALANCE ON ${scrubbedPoint.label.toUpperCase()}` : 'TOTAL NET BALANCE'}
+          </Text>
+        </View>
         <TouchableOpacity
-          onPress={() => setIsBalanceHidden(!isBalanceHidden)}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          onPress={toggleVisibility}
+          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
           accessibilityLabel="Toggle balance visibility"
+          style={styles.eyeButton}
         >
           <Ionicons
             name={isBalanceHidden ? 'eye-off-outline' : 'eye-outline'}
             size={18}
-            color="rgba(255, 255, 255, 0.85)"
+            color="rgba(255, 255, 255, 0.75)"
           />
         </TouchableOpacity>
       </View>
 
-      {/* Center Row: Large Balance & Sparkline Graph */}
-      <View style={styles.centerRow}>
-        <View style={styles.balanceCol}>
-          {isBalanceHidden ? (
-            <Text variant="display" weight="bold" style={styles.hiddenBalanceText}>
-              ₹••••••
-            </Text>
-          ) : (
-            <AnimatedNumber
-              value={totalBalance}
-              variant="display"
-              weight="bold"
-              style={styles.balanceText}
-            />
-          )}
-        </View>
-
-        {/* Responsive Sparkline Wave */}
-        <View style={styles.sparklineContainer}>
-          <SparklineGraph
-            width={110}
-            height={48}
-            strokeColor="#38BDF8"
-            gradientStartColor="rgba(56, 189, 248, 0.45)"
-            gradientEndColor="rgba(56, 189, 248, 0.0)"
-            dotColor="#22D3EE"
+      {/* Center Balance Display */}
+      <View style={styles.balanceContainer}>
+        {isBalanceHidden ? (
+          <Text variant="display" weight="bold" style={styles.hiddenBalanceText}>
+            ₹••••••••
+          </Text>
+        ) : (
+          <AnimatedNumber
+            value={displayedAmount}
+            variant="display"
+            weight="bold"
+            style={styles.balanceText}
+            testID="total-balance"
           />
-        </View>
+        )}
       </View>
 
-      {/* Bottom Row: Net Savings & Status Badge */}
-      <View style={styles.bottomRow}>
-        <View style={styles.savingsBadge}>
-          <Ionicons name="arrow-up" size={13} color="#34D399" />
-          <Text variant="caption" weight="semibold" style={styles.savingsText}>
-            {`Net Savings: ${formatCurrency(netSavings, { sign: true })} (${savingsRate}%)`}
+      {/* Interactive Trend Wave Graph */}
+      <View style={styles.graphContainer}>
+        <InteractiveTrendGraph
+          data={trendData}
+          width={graphWidth}
+          height={65}
+          strokeColor="#818CF8"
+          onScrub={setScrubbedPoint}
+          onScrubEnd={() => setScrubbedPoint(null)}
+        />
+      </View>
+
+      {/* Status Row */}
+      <View style={styles.statusRow}>
+        <View
+          style={[
+            styles.savingsPill,
+            {
+              backgroundColor: isPositiveSavings
+                ? 'rgba(52, 211, 153, 0.16)'
+                : 'rgba(251, 113, 133, 0.16)',
+            },
+          ]}
+        >
+          <Ionicons
+            name={isPositiveSavings ? 'trending-up' : 'trending-down'}
+            size={13}
+            color={isPositiveSavings ? '#34D399' : '#FB7185'}
+          />
+          <Text
+            variant="caption"
+            weight="semibold"
+            style={{
+              color: isPositiveSavings ? '#34D399' : '#FB7185',
+              fontSize: 12,
+            }}
+          >
+            {`${formatCurrency(netSavings, { sign: true })} net savings this month`}
           </Text>
         </View>
 
-        <View style={styles.trendBadge}>
-          <Ionicons name="shield-checkmark-outline" size={12} color="#34D399" />
-          <Text variant="caption" weight="bold" style={styles.trendText}>
-            Realtime
-          </Text>
-        </View>
+        <Text variant="caption" style={styles.scrubHint}>
+          Touch graph to scrub
+        </Text>
+      </View>
+
+      {/* Quick Action Buttons Row */}
+      <View style={styles.actionsRow}>
+        {onAddExpense && (
+          <TouchableOpacity
+            onPress={onAddExpense}
+            activeOpacity={0.8}
+            style={[styles.primaryActionBtn, { backgroundColor: colors.primary }]}
+            accessibilityRole="button"
+            accessibilityLabel="Add Expense"
+          >
+            <Ionicons name="add" size={17} color="#FFFFFF" />
+            <Text variant="bodySmall" weight="bold" style={styles.primaryActionText}>
+              Add Expense
+            </Text>
+          </TouchableOpacity>
+        )}
+
+        {onViewAccounts && (
+          <TouchableOpacity
+            onPress={onViewAccounts}
+            activeOpacity={0.7}
+            style={styles.secondaryActionBtn}
+            accessibilityRole="button"
+            accessibilityLabel="View Accounts"
+          >
+            <Ionicons name="wallet-outline" size={16} color="rgba(255, 255, 255, 0.85)" />
+            <Text variant="bodySmall" weight="semibold" style={styles.secondaryActionText}>
+              Accounts
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -98,85 +179,111 @@ export const FinancialSummaryCard: React.FC<FinancialSummaryCardProps> = ({
 
 const styles = StyleSheet.create({
   cardContainer: {
-    backgroundColor: '#4F46E5',
     borderRadius: radius.card,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.lg,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.md,
     marginBottom: spacing.md,
-    overflow: 'hidden',
-    shadowColor: '#4F46E5',
+    borderWidth: 1,
+    shadowColor: '#0F172A',
     shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.28,
-    shadowRadius: 12,
-    elevation: 6,
+    shadowOpacity: 0.14,
+    shadowRadius: 14,
+    elevation: 4,
   },
   topRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 4,
+    marginBottom: spacing.xs,
   },
-  label: {
-    color: 'rgba(255, 255, 255, 0.75)',
-    letterSpacing: 0.6,
-    fontSize: 11,
-  },
-  centerRow: {
+  labelContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginVertical: spacing.xs,
   },
-  balanceCol: {
-    flex: 1,
-    paddingRight: spacing.sm,
+  label: {
+    color: 'rgba(255, 255, 255, 0.72)',
+    letterSpacing: 0.6,
+    fontSize: 11.5,
+  },
+  eyeButton: {
+    padding: 4,
+  },
+  balanceContainer: {
+    marginVertical: spacing.xs - 4,
   },
   balanceText: {
     color: '#FFFFFF',
-    fontSize: 30,
-    lineHeight: 36,
+    fontSize: 34,
+    lineHeight: 40,
+    letterSpacing: -0.6,
+    fontWeight: '700',
   },
   hiddenBalanceText: {
     color: '#FFFFFF',
-    fontSize: 26,
-    lineHeight: 34,
+    fontSize: 28,
+    lineHeight: 38,
+    letterSpacing: 2,
   },
-  sparklineContainer: {
-    alignItems: 'flex-end',
+  graphContainer: {
+    marginVertical: spacing.xs,
+    alignItems: 'center',
     justifyContent: 'center',
   },
-  bottomRow: {
+  statusRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: spacing.sm,
-    paddingTop: spacing.xs,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.12)',
+    marginTop: spacing.xs,
+    marginBottom: spacing.md,
   },
-  savingsBadge: {
+  savingsPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    flex: 1,
-    paddingRight: spacing.xs,
-  },
-  savingsText: {
-    color: 'rgba(255, 255, 255, 0.9)',
-    fontSize: 11,
-  },
-  trendBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 3,
-    backgroundColor: 'rgba(52, 211, 153, 0.15)',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
+    gap: 5,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
     borderRadius: radius.full,
   },
-  trendText: {
-    color: '#34D399',
+  scrubHint: {
+    color: 'rgba(255, 255, 255, 0.45)',
     fontSize: 11,
   },
+  actionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingTop: spacing.sm,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  primaryActionBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 9,
+    borderRadius: radius.button,
+    gap: 5,
+  },
+  primaryActionText: {
+    color: '#FFFFFF',
+    fontSize: 13.5,
+  },
+  secondaryActionBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.md,
+    paddingVertical: 9,
+    borderRadius: radius.button,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.12)',
+    gap: 6,
+  },
+  secondaryActionText: {
+    color: 'rgba(255, 255, 255, 0.9)',
+    fontSize: 13.5,
+  },
 });
-

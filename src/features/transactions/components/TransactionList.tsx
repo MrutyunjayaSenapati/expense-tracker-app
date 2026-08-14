@@ -9,7 +9,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Transaction } from '../../../types/transaction';
 import { Category } from '../../../types/category';
 import { Account } from '../../../types/account';
-import { colors } from '../../../theme/colors';
+import { useTheme } from '../../../hooks/useTheme';
 import { spacing } from '../../../theme/spacing';
 import { radius } from '../../../theme/radius';
 import { Text } from '../../../components/ui/Text';
@@ -51,6 +51,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   onResetFilters,
   hasActiveFilters = false,
 }) => {
+  const { colors } = useTheme();
   const categoryMap = useMemo(() => new Map(categories.map(c => [c.id, c])), [categories]);
   const accountMap = useMemo(() => new Map(accounts.map(a => [a.id, a])), [accounts]);
 
@@ -124,38 +125,56 @@ export const TransactionList: React.FC<TransactionListProps> = ({
           />
         ) : undefined
       }
-      renderSectionHeader={({ section: { title, totalExpense } }) => (
+      renderSectionHeader={({ section: { title, totalExpense, totalIncome } }) => (
         <View style={styles.sectionHeader}>
-          <Text variant="caption" weight="bold" color="secondary">
+          <Text variant="captionBold" color="secondary" style={styles.sectionTitle}>
             {title.toUpperCase()}
           </Text>
           {totalExpense > 0 && (
-            <View style={styles.spentPill}>
-              <Text variant="caption" weight="semibold" color="secondary">
+            <View style={[styles.spentPill, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }]}>
+              <Text variant="caption" weight="bold" color="secondary" style={styles.spentText}>
                 {`Spent: ${formatCurrency(totalExpense)}`}
               </Text>
             </View>
           )}
         </View>
       )}
-      renderItem={({ item, index }) => (
-        <Animated.View entering={FadeInDown.duration(300).delay(Math.min(index * 40, 200))}>
-          <TransactionRow
-            transaction={item}
-            category={categoryMap.get(item.categoryId)}
-            account={accountMap.get(item.accountId)}
-            onPress={() => onSelectTransaction(item.id)}
-            style={styles.rowItem}
-          />
-        </Animated.View>
-      )}
+      renderItem={({ item, index, section }) => {
+        const isLastItem = index === section.data.length - 1;
+        const isFirstItem = index === 0;
+
+        return (
+          <Animated.View
+            entering={FadeInDown.duration(300).delay(Math.min(index * 25, 150))}
+            style={[
+              styles.itemContainer,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+              },
+              isFirstItem && styles.firstItem,
+              isLastItem && styles.lastItem,
+            ]}
+          >
+            <TransactionRow
+              transaction={item}
+              category={categoryMap.get(item.categoryId)}
+              account={accountMap.get(item.accountId)}
+              onPress={() => onSelectTransaction(item.id)}
+            />
+            {!isLastItem && (
+              <View style={[styles.separator, { backgroundColor: colors.divider || colors.border }]} />
+            )}
+          </Animated.View>
+        );
+      }}
     />
   );
 };
 
 const styles = StyleSheet.create({
   listContent: {
-    paddingBottom: spacing.gigantic + 24,
+    paddingBottom: 140,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -165,15 +184,36 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     marginBottom: spacing.xs,
   },
-  spentPill: {
-    backgroundColor: colors.surfaceMuted,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    borderRadius: radius.full,
+  sectionTitle: {
+    letterSpacing: 0.6,
+    fontSize: 11.5,
   },
-  rowItem: {
-    marginBottom: spacing.xs,
+  spentPill: {
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2.5,
+    borderRadius: radius.full,
     borderWidth: 1,
-    borderColor: colors.border,
+  },
+  spentText: {
+    fontSize: 11,
+  },
+  itemContainer: {
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+  },
+  firstItem: {
+    borderTopWidth: 1,
+    borderTopLeftRadius: radius.card,
+    borderTopRightRadius: radius.card,
+  },
+  lastItem: {
+    borderBottomWidth: 1,
+    borderBottomLeftRadius: radius.card,
+    borderBottomRightRadius: radius.card,
+    marginBottom: spacing.xs,
+  },
+  separator: {
+    height: 1,
+    marginLeft: 56,
   },
 });

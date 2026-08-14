@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useTheme } from '../../../hooks/useTheme';
 import { spacing } from '../../../theme/spacing';
+import { radius } from '../../../theme/radius';
 import { Text } from '../../../components/ui/Text';
 import { AnimatedNumber } from '../../../components/ui/AnimatedNumber';
 import { Card } from '../../../components/ui/Card';
@@ -19,87 +20,61 @@ export interface IncomeExpenseCardProps {
 export const IncomeExpenseCard: React.FC<IncomeExpenseCardProps> = ({
   totalIncome,
   totalExpense,
-  netSavings,
-  savingsRate = 0,
   incomeCount = 0,
   expenseCount = 0,
 }) => {
   const { colors } = useTheme();
-  const savings = netSavings !== undefined ? netSavings : totalIncome - totalExpense;
 
   return (
     <View style={styles.container}>
       {/* 1. Income Card */}
       <Card variant="solid" elevation="sm" style={styles.metricCard}>
-        <View style={styles.iconRow}>
+        <View style={styles.topRow}>
           <View style={[styles.iconCircle, { backgroundColor: colors.incomeSoft }]}>
-            <Ionicons name="trending-up" size={13} color={colors.income} />
+            <Ionicons name="arrow-down" size={14} color={colors.income} />
           </View>
+          <Text variant="caption" color="secondary" weight="semibold">
+            Income
+          </Text>
         </View>
-        <Text variant="caption" color="secondary" style={styles.label}>
-          Income
-        </Text>
+
         <AnimatedNumber
           value={totalIncome}
-          variant="bodyLarge"
+          variant="headingM"
           weight="bold"
-          color="primary"
+          color="income"
           style={styles.amountText}
         />
-        <View style={styles.trendRow}>
-          <Ionicons name="arrow-up" size={10} color={colors.income} />
-          <Text variant="caption" style={[styles.trendText, { color: colors.income }]}>
-            {incomeCount > 0 ? `${incomeCount} txn${incomeCount > 1 ? 's' : ''}` : 'This month'}
+
+        <View style={styles.subRow}>
+          <Text variant="caption" color="tertiary">
+            {incomeCount > 0 ? `${incomeCount} transaction${incomeCount > 1 ? 's' : ''}` : 'No income'}
           </Text>
         </View>
       </Card>
 
       {/* 2. Expenses Card */}
       <Card variant="solid" elevation="sm" style={styles.metricCard}>
-        <View style={styles.iconRow}>
+        <View style={styles.topRow}>
           <View style={[styles.iconCircle, { backgroundColor: colors.expenseSoft }]}>
-            <Ionicons name="trending-down" size={13} color={colors.expense} />
+            <Ionicons name="arrow-up" size={14} color={colors.expense} />
           </View>
-        </View>
-        <Text variant="caption" color="secondary" style={styles.label}>
-          Expenses
-        </Text>
-        <AnimatedNumber
-          value={totalExpense}
-          variant="bodyLarge"
-          weight="bold"
-          color="primary"
-          style={styles.amountText}
-        />
-        <View style={styles.trendRow}>
-          <Ionicons name="arrow-down" size={10} color={colors.expense} />
-          <Text variant="caption" style={[styles.trendText, { color: colors.expense }]}>
-            {expenseCount > 0 ? `${expenseCount} txn${expenseCount > 1 ? 's' : ''}` : 'This month'}
+          <Text variant="caption" color="secondary" weight="semibold">
+            Expenses
           </Text>
         </View>
-      </Card>
 
-      {/* 3. Savings Card */}
-      <Card variant="solid" elevation="sm" style={styles.metricCard}>
-        <View style={styles.iconRow}>
-          <View style={[styles.iconCircle, { backgroundColor: colors.savingsSoft }]}>
-            <Ionicons name="wallet-outline" size={13} color={colors.savings} />
-          </View>
-        </View>
-        <Text variant="caption" color="secondary" style={styles.label}>
-          Savings
-        </Text>
         <AnimatedNumber
-          value={savings}
-          variant="bodyLarge"
+          value={totalExpense}
+          variant="headingM"
           weight="bold"
-          color="primary"
+          color="expense"
           style={styles.amountText}
         />
-        <View style={styles.trendRow}>
-          <Ionicons name="sparkles" size={9} color={colors.savings} />
-          <Text variant="caption" style={[styles.trendText, { color: colors.savings }]}>
-            {`${savingsRate}% saved`}
+
+        <View style={styles.subRow}>
+          <Text variant="caption" color="tertiary">
+            {expenseCount > 0 ? `${expenseCount} transaction${expenseCount > 1 ? 's' : ''}` : 'No expenses'}
           </Text>
         </View>
       </Card>
@@ -110,42 +85,34 @@ export const IncomeExpenseCard: React.FC<IncomeExpenseCardProps> = ({
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    gap: spacing.xs + 2,
+    gap: spacing.sm,
     marginBottom: spacing.md,
   },
   metricCard: {
     flex: 1,
-    padding: spacing.sm,
+    padding: spacing.md,
     justifyContent: 'space-between',
+    borderRadius: radius.card,
   },
-  iconRow: {
-    marginBottom: 2,
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs + 2,
+    marginBottom: spacing.xs,
   },
   iconCircle: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  label: {
-    fontSize: 11,
-    marginBottom: 2,
-  },
   amountText: {
-    fontSize: 15,
-    lineHeight: 20,
+    marginVertical: 2,
+    fontSize: 20,
+    lineHeight: 26,
   },
-  trendRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 3,
-    gap: 2,
-  },
-  trendText: {
-    fontSize: 10,
-    fontWeight: '600',
+  subRow: {
+    marginTop: 2,
   },
 });
-
-

@@ -1,0 +1,110 @@
+appId: com.mrnobody007.expensetracker
+name: Expense Tracker — Smoke Test
+tags:
+  - smoke
+  - regression
+---
+# ---------------------------------------------------------------------------
+# Prerequisites:
+#   1. Development build installed on the device.
+#   2. Metro running locally: npx expo start
+#   3. USB reverse tunnel (for USB-connected devices):
+#        adb reverse tcp:8081 tcp:8081
+#
+# If the Expo Dev Launcher is shown instead of the app, this flow connects to
+# the local Metro server automatically.
+# ---------------------------------------------------------------------------
+
+- launchApp
+
+# --- Connect to Metro if the Dev Launcher is showing -----------------------
+- runFlow:
+    when:
+      visible: "Development Build"
+    commands:
+      - tapOn:
+          text: "http://"
+      - eraseText: 10
+      - inputText: "http://localhost:8081"
+      - hideKeyboard
+      - tapOn:
+          text: "Connect"
+          optional: true
+      - extendedWaitUntil:
+          notVisible: "Development Build"
+          timeout: 60000
+
+# --- Home ------------------------------------------------------------------
+- extendedWaitUntil:
+    visible:
+      id: "total-balance"
+    timeout: 120000
+- assertVisible:
+    id: "tab-home"
+- assertVisible:
+    id: "tab-activity"
+- assertVisible:
+    id: "tab-reports"
+- assertVisible:
+    id: "tab-settings"
+- assertVisible:
+    id: "tab-add"
+
+# --- Activity (Transactions) ----------------------------------------------
+- tapOn:
+    id: "tab-activity"
+- assertVisible: "Transactions"
+- assertVisible: "Search merchants, notes..."
+- assertVisible:
+    id: "transaction-row"
+- tapOn:
+    id: "transaction-row"
+    index: 0
+- extendedWaitUntil:
+    visible: "Transaction Details"
+    timeout: 8000
+- assertVisible:
+    id: "edit-transaction"
+- assertVisible:
+    id: "delete-transaction"
+- back
+
+# --- Add Transaction form --------------------------------------------------
+- tapOn:
+    id: "tab-add"
+- extendedWaitUntil:
+    visible: "Add Transaction"
+    timeout: 8000
+- assertVisible:
+    id: "transaction-type-expense"
+- assertVisible:
+    id: "transaction-type-income"
+- assertVisible:
+    id: "category-selector"
+- assertVisible:
+    id: "account-selector"
+
+# --- Reports ---------------------------------------------------------------
+- tapOn:
+    id: "tab-reports"
+- assertVisible: "Financial Reports"
+- assertVisible:
+    id: "report-period-week"
+- assertVisible:
+    id: "report-period-month"
+- assertVisible:
+    id: "report-period-year"
+- assertVisible: "NET SAVINGS"
+
+# --- Settings --------------------------------------------------------------
+- tapOn:
+    id: "tab-settings"
+- assertVisible: "Settings & Profile"
+- assertVisible: "Default Currency"
+- assertVisible: "Theme Mode"
+
+# --- Back Home -------------------------------------------------------------
+- tapOn:
+    id: "tab-home"
+- assertVisible:
+    id: "total-balance"

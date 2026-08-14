@@ -61,6 +61,7 @@ export const BudgetForm: React.FC<BudgetFormProps> = ({
     handleSubmit,
     watch,
     setValue,
+    getValues,
     formState: { errors },
   } = useForm<BudgetFormValues>({
     resolver: zodResolver(budgetFormSchema),
@@ -207,7 +208,7 @@ export const BudgetForm: React.FC<BudgetFormProps> = ({
                 key={cat.id}
                 onPress={() => {
                   setValue('categoryId', cat.id);
-                  if (!watch('name')) {
+                  if (!getValues('name')) {
                     setValue('name', cat.name);
                   }
                   setCategorySheetVisible(false);

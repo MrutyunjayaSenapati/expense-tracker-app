@@ -25,6 +25,7 @@ export const ReportPeriodSelector: React.FC<ReportPeriodSelectorProps> = ({
       onChange={val => onChange(val as ReportPeriod)}
       semanticColoring={false}
       style={style}
+      testID="report-period"
     />
   );
 };

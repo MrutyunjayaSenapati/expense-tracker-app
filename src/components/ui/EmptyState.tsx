@@ -5,9 +5,11 @@ import { useTheme } from '../../hooks/useTheme';
 import { spacing } from '../../theme/spacing';
 import { Text } from './Text';
 import { Button } from './Button';
+import { LottieAnimation } from './LottieAnimation';
 
 export interface EmptyStateProps {
   icon?: keyof typeof Ionicons.glyphMap;
+  lottieSource?: any;
   title: string;
   message: string;
   actionLabel?: string;
@@ -16,7 +18,8 @@ export interface EmptyStateProps {
 }
 
 export const EmptyState: React.FC<EmptyStateProps> = ({
-  icon = 'receipt-outline',
+  icon,
+  lottieSource,
   title,
   message,
   actionLabel,
@@ -24,12 +27,23 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   style,
 }) => {
   const { colors } = useTheme();
+  const defaultLottie = require('../../../assets/animations/empty.json');
+  const animSource = lottieSource || (!icon ? defaultLottie : null);
 
   return (
     <View style={[styles.container, style]}>
-      <View style={[styles.iconCircle, { backgroundColor: colors.primaryLight }]}>
-        <Ionicons name={icon} size={36} color={colors.primary} />
-      </View>
+      {animSource ? (
+        <LottieAnimation
+          source={animSource}
+          width={130}
+          height={130}
+          style={styles.animation}
+        />
+      ) : (
+        <View style={[styles.iconCircle, { backgroundColor: colors.primaryLight }]}>
+          <Ionicons name={icon || 'receipt-outline'} size={36} color={colors.primary} />
+        </View>
+      )}
       <Text variant="headingM" weight="bold" align="center" style={styles.title}>
         {title}
       </Text>
@@ -57,6 +71,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xxl,
     paddingVertical: spacing.xxxl,
   },
+  animation: {
+    marginBottom: spacing.md,
+  },
   iconCircle: {
     width: 72,
     height: 72,
@@ -70,6 +87,7 @@ const styles = StyleSheet.create({
   },
   message: {
     marginBottom: spacing.xl,
+    maxWidth: 280,
   },
   actionButton: {
     minWidth: 160,

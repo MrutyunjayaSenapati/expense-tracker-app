@@ -4,6 +4,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { accountFormSchema, AccountFormValues } from '../../../schemas/accountSchema';
 import { spacing } from '../../../theme/spacing';
+import { Text } from '../../../components/ui/Text';
 import { Input } from '../../../components/ui/Input';
 import { Button } from '../../../components/ui/Button';
 import { SegmentedControl } from '../../../components/ui/SegmentedControl';
@@ -64,12 +65,9 @@ export const AccountForm: React.FC<AccountFormProps> = ({
         />
 
         <View style={styles.fieldWrapper}>
-          <Input
-            label="ACCOUNT TYPE"
-            editable={false}
-            value={selectedType.toUpperCase()}
-            containerStyle={{ marginBottom: spacing.xs }}
-          />
+          <Text variant="label" color="secondary" style={styles.fieldLabel}>
+            ACCOUNT TYPE
+          </Text>
           <SegmentedControl
             options={[
               { value: 'bank', label: 'Bank' },
@@ -161,6 +159,10 @@ const styles = StyleSheet.create({
   },
   fieldWrapper: {
     marginBottom: spacing.lg,
+  },
+  fieldLabel: {
+    marginBottom: spacing.xs + 2,
+    letterSpacing: 0.6,
   },
   actions: {
     marginTop: spacing.xl,
