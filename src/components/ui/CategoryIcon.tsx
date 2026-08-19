@@ -37,6 +37,8 @@ export const CategoryIcon: React.FC<CategoryIconProps> = ({
   // Safely map icon names or fallback to 'grid'
   const validIcon = (icon in Ionicons.glyphMap ? icon : 'grid') as keyof typeof Ionicons.glyphMap;
 
+  const squircleRadius = size === 'sm' ? 10 : size === 'lg' ? 18 : 14;
+
   return (
     <View
       style={[
@@ -44,8 +46,10 @@ export const CategoryIcon: React.FC<CategoryIconProps> = ({
         {
           width: container,
           height: container,
-          borderRadius: radius.full,
+          borderRadius: squircleRadius,
           backgroundColor: `${color}18`, // 10% opacity tint
+          borderWidth: 1,
+          borderColor: `${color}25`,
         },
         style,
       ]}

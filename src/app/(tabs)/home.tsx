@@ -11,11 +11,12 @@ import { useTheme } from '../../hooks/useTheme';
 import { spacing } from '../../theme/spacing';
 import { AmbientMeshBackground } from '../../components/ui/AmbientMeshBackground';
 import { DashboardHeader } from '../../features/dashboard/components/DashboardHeader';
-import { FinancialSummaryCard } from '../../features/dashboard/components/FinancialSummaryCard';
+import { RevolutHeroSection } from '../../features/dashboard/components/RevolutHeroSection';
+import { RevolutVaultsCarousel } from '../../features/dashboard/components/RevolutVaultsCarousel';
+import { RevolutSpendVelocityBar } from '../../features/dashboard/components/RevolutSpendVelocityBar';
 import { HabitStreakCard } from '../../features/dashboard/components/HabitStreakCard';
 import { IncomeExpenseCard } from '../../features/dashboard/components/IncomeExpenseCard';
 import { MonthlyBudgetCard } from '../../features/dashboard/components/MonthlyBudgetCard';
-import { SpendingByCategoryCard } from '../../features/dashboard/components/SpendingByCategoryCard';
 import { RecentTransactionsSection } from '../../features/dashboard/components/RecentTransactionsSection';
 import { CardSkeleton, ListSkeleton } from '../../components/ui/LoadingState';
 import { ErrorState } from '../../components/ui/ErrorState';
@@ -80,8 +81,8 @@ export default function HomeScreen() {
             />
           }
         >
-          {/* Header */}
-          <Animated.View entering={FadeInDown.duration(350).delay(40)}>
+          {/* 1. Revolut Top Header */}
+          <Animated.View entering={FadeInDown.duration(350).delay(30)}>
             <DashboardHeader
               user={user}
               streakDays={dashboard.streakDays}
@@ -90,26 +91,39 @@ export default function HomeScreen() {
             />
           </Animated.View>
 
-          {/* Hero Net Balance & Quick Actions */}
-          <Animated.View entering={FadeInDown.duration(400).delay(80)}>
-            <FinancialSummaryCard
+          {/* 2. Revolut Borderless Hero Balance & 4 Action Circles */}
+          <Animated.View entering={FadeInDown.duration(400).delay(60)}>
+            <RevolutHeroSection
               totalBalance={dashboard.totalBalance}
               netSavings={dashboard.netSavings}
+              accounts={accounts}
               onAddExpense={() => router.push('/(tabs)/add')}
-              onViewAccounts={() => router.push('/accounts')}
             />
           </Animated.View>
 
-          {/* Habit Streak & Monthly Savings Highlights */}
-          <Animated.View entering={FadeInDown.duration(400).delay(100)}>
+          {/* 3. Revolut Vaults & Pockets Carousel (Savings Goals) */}
+          <Animated.View entering={FadeInDown.duration(400).delay(90)}>
+            <RevolutVaultsCarousel />
+          </Animated.View>
+
+          {/* 4. Revolut Smart Spend Velocity Bar */}
+          <Animated.View entering={FadeInDown.duration(400).delay(120)}>
+            <RevolutSpendVelocityBar
+              totalSpentThisMonth={dashboard.totalExpense}
+              totalMonthlyBudget={dashboard.monthlyBudget || 50000}
+            />
+          </Animated.View>
+
+          {/* 5. Habit Streak Highlight */}
+          <Animated.View entering={FadeInDown.duration(400).delay(150)}>
             <HabitStreakCard
               streakDays={dashboard.streakDays}
               netSavings={dashboard.netSavings}
             />
           </Animated.View>
 
-          {/* Dual Cashflow Summary */}
-          <Animated.View entering={FadeInDown.duration(400).delay(130)}>
+          {/* 6. Dual Cashflow Card */}
+          <Animated.View entering={FadeInDown.duration(400).delay(180)}>
             <IncomeExpenseCard
               totalIncome={dashboard.totalIncome}
               totalExpense={dashboard.totalExpense}
@@ -120,26 +134,8 @@ export default function HomeScreen() {
             />
           </Animated.View>
 
-          {/* Monthly Budget Card */}
-          <Animated.View entering={FadeInDown.duration(400).delay(160)}>
-            <MonthlyBudgetCard
-              monthlyBudget={dashboard.monthlyBudget}
-              monthlyBudgetSpent={dashboard.monthlyBudgetSpent}
-              status={dashboard.budgetStatus}
-              onPress={() => router.push('/budgets')}
-            />
-          </Animated.View>
-
-          {/* Top Spending Categories Donut */}
-          <Animated.View entering={FadeInDown.duration(400).delay(200)}>
-            <SpendingByCategoryCard
-              categories={dashboard.categorySpending}
-              onViewReports={() => router.push('/(tabs)/reports')}
-            />
-          </Animated.View>
-
-          {/* Recent Transactions Grouped List */}
-          <Animated.View entering={FadeInDown.duration(400).delay(240)}>
+          {/* 7. Grouped Recent Transactions Feed */}
+          <Animated.View entering={FadeInDown.duration(400).delay(210)}>
             <RecentTransactionsSection
               transactions={dashboard.recentTransactions}
               categories={categories}

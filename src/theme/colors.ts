@@ -90,145 +90,145 @@ export interface ThemeColors {
 }
 
 export const lightPalette: ThemeColors = {
-  primary: '#4F46E5', // Rich Indigo
-  primaryDark: '#4338CA',
-  primaryLight: '#EEF2FF',
-  primaryGlow: 'rgba(79, 70, 229, 0.16)',
+  primary: '#0075FF', // Revolut Electric Blue
+  primaryDark: '#005BC5',
+  primaryLight: 'rgba(0, 117, 255, 0.12)',
+  primaryGlow: 'rgba(0, 117, 255, 0.25)',
 
-  background: '#F8F9FA', // Clean modern off-white
+  background: '#F7F9FC', // Clean Swiss off-white
   surface: '#FFFFFF',
   surfaceElevated: '#FFFFFF',
-  surfaceMuted: '#F1F3F9',
+  surfaceMuted: '#EDF2F7',
   surfaceSubtle: '#F8FAFC',
 
-  glassSurface: 'rgba(255, 255, 255, 0.90)',
-  glassSurfaceSubtle: 'rgba(255, 255, 255, 0.70)',
-  glassBorder: 'rgba(229, 231, 235, 0.8)',
-  glassBorderDark: 'rgba(15, 23, 42, 0.06)',
+  glassSurface: 'rgba(255, 255, 255, 0.92)',
+  glassSurfaceSubtle: 'rgba(255, 255, 255, 0.75)',
+  glassBorder: 'rgba(226, 232, 240, 0.8)',
+  glassBorderDark: 'rgba(15, 23, 42, 0.08)',
   glassHighlight: 'rgba(255, 255, 255, 0.95)',
-  glassBackdrop: 'rgba(15, 23, 42, 0.35)',
+  glassBackdrop: 'rgba(7, 9, 14, 0.40)',
 
-  heroBackground: '#1E1B4B', // Deep indigo/slate hero card
+  heroBackground: '#0B1222', // Dark slate hero card for crisp contrast
   heroBorder: 'rgba(255, 255, 255, 0.12)',
   heroTextPrimary: '#FFFFFF',
   heroTextSecondary: 'rgba(255, 255, 255, 0.72)',
 
-  textPrimary: '#0F172A', // Slate 900
-  textSecondary: '#475569', // Slate 600
-  textTertiary: '#94A3B8', // Slate 400
-  textDisabled: '#CBD5E1', // Slate 300
+  textPrimary: '#0F172A',
+  textSecondary: '#475569',
+  textTertiary: '#94A3B8',
+  textDisabled: '#CBD5E1',
   textInverse: '#FFFFFF',
 
-  expense: '#E11D48', // Rose 600
-  expenseSoft: '#FFE4E6',
-  expenseGlow: 'rgba(225, 29, 72, 0.12)',
-  income: '#059669', // Emerald 600
-  incomeSoft: '#D1FAE5',
-  incomeGlow: 'rgba(5, 150, 105, 0.12)',
-  savings: '#2563EB', // Blue 600
-  savingsSoft: '#DBEAFE',
-  savingsGlow: 'rgba(37, 99, 235, 0.12)',
-  warning: '#D97706', // Amber 600
-  warningSoft: '#FEF3C7',
-  warningGlow: 'rgba(217, 119, 6, 0.12)',
-  info: '#4F46E5',
-  infoSoft: '#EEF2FF',
-  success: '#059669',
-  successSoft: '#D1FAE5',
-  error: '#E11D48',
-  errorSoft: '#FFE4E6',
+  expense: '#FF3B30', // Revolut Electric Coral
+  expenseSoft: '#FFE5E5',
+  expenseGlow: 'rgba(255, 59, 48, 0.14)',
+  income: '#00D09C', // Revolut Mint Green
+  incomeSoft: '#E0FAF2',
+  incomeGlow: 'rgba(0, 208, 156, 0.14)',
+  savings: '#0075FF',
+  savingsSoft: '#E6F1FF',
+  savingsGlow: 'rgba(0, 117, 255, 0.14)',
+  warning: '#FF9500',
+  warningSoft: '#FFF4E5',
+  warningGlow: 'rgba(255, 149, 0, 0.14)',
+  info: '#0075FF',
+  infoSoft: '#E6F1FF',
+  success: '#00D09C',
+  successSoft: '#E0FAF2',
+  error: '#FF3B30',
+  errorSoft: '#FFE5E5',
 
   border: '#E2E8F0',
   borderStrong: '#CBD5E1',
   divider: '#F1F5F9',
 
-  streakOrange: '#EA580C',
-  streakSoft: '#FFEDD5',
-  trophyGold: '#D97706',
-  trophySoft: '#FEF3C7',
+  streakOrange: '#FF6B00',
+  streakSoft: '#FFF0E6',
+  trophyGold: '#FFB800',
+  trophySoft: '#FFF8E6',
 
-  overlay: 'rgba(15, 23, 42, 0.45)',
-  backdrop: 'rgba(15, 23, 42, 0.65)',
+  overlay: 'rgba(7, 9, 14, 0.45)',
+  backdrop: 'rgba(7, 9, 14, 0.70)',
 
   categoryColors: {
-    food: '#EA580C',
-    groceries: '#059669',
-    shopping: '#7C3AED',
-    travel: '#0284C7',
-    bills: '#E11D48',
-    entertainment: '#DB2777',
-    health: '#0D9488',
-    education: '#4F46E5',
-    rent: '#D97706',
-    subscriptions: '#0891B2',
-    personal: '#2563EB',
-    salary: '#059669',
-    freelance: '#0D9488',
-    investment: '#2563EB',
-    gift: '#E11D48',
+    food: '#FF6B00',
+    groceries: '#00D09C',
+    shopping: '#8A3FFC',
+    travel: '#0075FF',
+    bills: '#FF3B30',
+    entertainment: '#FA4D56',
+    health: '#00D09C',
+    education: '#0075FF',
+    rent: '#FF9500',
+    subscriptions: '#8A3FFC',
+    personal: '#0075FF',
+    salary: '#00D09C',
+    freelance: '#00B4D8',
+    investment: '#0075FF',
+    gift: '#FF3B30',
     other: '#64748B',
   },
 };
 
 export const darkPalette: ThemeColors = {
-  primary: '#6366F1', // Indigo 500
-  primaryDark: '#4F46E5',
-  primaryLight: 'rgba(99, 102, 241, 0.18)',
-  primaryGlow: 'rgba(99, 102, 241, 0.25)',
+  primary: '#0075FF', // Revolut Electric Blue
+  primaryDark: '#005BC5',
+  primaryLight: 'rgba(0, 117, 255, 0.20)',
+  primaryGlow: 'rgba(0, 117, 255, 0.35)',
 
-  background: '#090A0F', // Deep obsidian
-  surface: 'rgba(19, 21, 31, 0.76)', // Frosted glass surface
-  surfaceElevated: 'rgba(26, 30, 46, 0.86)',
+  background: '#07090E', // Revolut Pure Obsidian Black
+  surface: 'rgba(17, 22, 34, 0.85)', // Frosted glass surface
+  surfaceElevated: 'rgba(24, 31, 48, 0.95)',
   surfaceMuted: 'rgba(255, 255, 255, 0.08)',
-  surfaceSubtle: 'rgba(255, 255, 255, 0.05)',
+  surfaceSubtle: 'rgba(255, 255, 255, 0.04)',
 
-  glassSurface: 'rgba(19, 21, 31, 0.62)',
-  glassSurfaceSubtle: 'rgba(255, 255, 255, 0.04)',
-  glassBorder: 'rgba(255, 255, 255, 0.12)',
-  glassBorderDark: 'rgba(0, 0, 0, 0.40)',
-  glassHighlight: 'rgba(255, 255, 255, 0.20)',
-  glassBackdrop: 'rgba(9, 10, 15, 0.60)',
+  glassSurface: 'rgba(17, 22, 34, 0.75)',
+  glassSurfaceSubtle: 'rgba(255, 255, 255, 0.035)',
+  glassBorder: 'rgba(255, 255, 255, 0.09)',
+  glassBorderDark: 'rgba(0, 0, 0, 0.50)',
+  glassHighlight: 'rgba(255, 255, 255, 0.16)',
+  glassBackdrop: 'rgba(7, 9, 14, 0.75)',
 
-  heroBackground: 'rgba(24, 27, 44, 0.82)',
-  heroBorder: 'rgba(255, 255, 255, 0.15)',
+  heroBackground: 'rgba(17, 22, 34, 0.90)',
+  heroBorder: 'rgba(255, 255, 255, 0.10)',
   heroTextPrimary: '#FFFFFF',
-  heroTextSecondary: 'rgba(255, 255, 255, 0.76)',
+  heroTextSecondary: 'rgba(255, 255, 255, 0.70)',
 
-  textPrimary: '#F8FAFC', // Slate 50
-  textSecondary: '#CBD5E1', // Slate 300 (Crisp contrast)
-  textTertiary: '#94A3B8', // Slate 400
-  textDisabled: '#475569', // Slate 600
-  textInverse: '#0F172A',
+  textPrimary: '#FFFFFF',
+  textSecondary: '#94A3B8', // Slate 400 (Revolut high contrast subtext)
+  textTertiary: '#64748B',
+  textDisabled: '#334155',
+  textInverse: '#07090E',
 
-  expense: '#FB7185', // Rose 400 (soft, readable)
-  expenseSoft: 'rgba(251, 113, 133, 0.14)',
-  expenseGlow: 'rgba(251, 113, 133, 0.2)',
-  income: '#34D399', // Emerald 400
-  incomeSoft: 'rgba(52, 211, 153, 0.14)',
-  incomeGlow: 'rgba(52, 211, 153, 0.2)',
-  savings: '#60A5FA', // Blue 400
-  savingsSoft: 'rgba(96, 165, 250, 0.14)',
-  savingsGlow: 'rgba(96, 165, 250, 0.2)',
-  warning: '#FBBF24', // Amber 400
-  warningSoft: 'rgba(251, 191, 36, 0.14)',
-  warningGlow: 'rgba(251, 191, 36, 0.2)',
-  info: '#818CF8',
-  infoSoft: 'rgba(129, 140, 248, 0.14)',
-  success: '#34D399',
-  successSoft: 'rgba(52, 211, 153, 0.14)',
-  error: '#FB7185',
-  errorSoft: 'rgba(251, 113, 133, 0.14)',
+  expense: '#FF453A', // Revolut Coral Red
+  expenseSoft: 'rgba(255, 69, 58, 0.15)',
+  expenseGlow: 'rgba(255, 69, 58, 0.30)',
+  income: '#00D09C', // Revolut Mint Green
+  incomeSoft: 'rgba(0, 208, 156, 0.15)',
+  incomeGlow: 'rgba(0, 208, 156, 0.30)',
+  savings: '#0075FF',
+  savingsSoft: 'rgba(0, 117, 255, 0.15)',
+  savingsGlow: 'rgba(0, 117, 255, 0.30)',
+  warning: '#FF9F0A',
+  warningSoft: 'rgba(255, 159, 10, 0.15)',
+  warningGlow: 'rgba(255, 159, 10, 0.30)',
+  info: '#0075FF',
+  infoSoft: 'rgba(0, 117, 255, 0.15)',
+  success: '#00D09C',
+  successSoft: 'rgba(0, 208, 156, 0.15)',
+  error: '#FF453A',
+  errorSoft: 'rgba(255, 69, 58, 0.15)',
 
   border: 'rgba(255, 255, 255, 0.08)',
-  borderStrong: 'rgba(255, 255, 255, 0.14)',
-  divider: 'rgba(255, 255, 255, 0.05)',
+  borderStrong: 'rgba(255, 255, 255, 0.16)',
+  divider: 'rgba(255, 255, 255, 0.06)',
 
-  streakOrange: '#FB923C',
-  streakSoft: 'rgba(251, 146, 60, 0.14)',
-  trophyGold: '#FBBF24',
-  trophySoft: 'rgba(251, 191, 36, 0.14)',
+  streakOrange: '#FF6B00',
+  streakSoft: 'rgba(255, 107, 0, 0.16)',
+  trophyGold: '#FFB800',
+  trophySoft: 'rgba(255, 184, 0, 0.16)',
 
-  overlay: 'rgba(0, 0, 0, 0.75)',
+  overlay: 'rgba(0, 0, 0, 0.65)',
   backdrop: 'rgba(0, 0, 0, 0.85)',
 
   categoryColors: {

@@ -7,10 +7,12 @@ export const radius = {
   full: 999,
 
   // Semantic mappings
-  input: 12,
-  button: 12,
-  card: 16,
-  bottomSheet: 24,
+  input: 14,
+  button: 24,
+  card: 20,
+  cardLarge: 24,
+  squircle: 16,
+  bottomSheet: 28,
   chip: 999,
   avatar: 999,
 } as const;
