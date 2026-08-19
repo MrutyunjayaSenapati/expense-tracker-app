@@ -1,11 +1,18 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import { View, StyleSheet, ScrollView, RefreshControl, Platform, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { File, Paths } from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
+import { Ionicons } from '@expo/vector-icons';
 import { useReportData } from '../../hooks/useReportData';
 import { ReportPeriod } from '../../types/reports';
 import { useTheme } from '../../hooks/useTheme';
+import { useHaptics } from '../../hooks/useHaptics';
+import { useAppStore } from '../../store/useAppStore';
+import { apiClient } from '../../services/api/apiClient';
 import { spacing } from '../../theme/spacing';
+import { radius } from '../../theme/radius';
 import { Text } from '../../components/ui/Text';
 import { AmbientMeshBackground } from '../../components/ui/AmbientMeshBackground';
 import { ReportPeriodSelector } from '../../features/reports/components/ReportPeriodSelector';
@@ -18,7 +25,10 @@ import { ErrorState } from '../../components/ui/ErrorState';
 
 export default function ReportsScreen() {
   const [period, setPeriod] = useState<ReportPeriod>('month');
+  const [isExporting, setIsExporting] = useState(false);
   const { colors } = useTheme();
+  const haptics = useHaptics();
+  const showToast = useAppStore(state => state.showToast);
 
   const {
     data: reports,
@@ -28,16 +38,60 @@ export default function ReportsScreen() {
     refetch,
   } = useReportData(period);
 
+  const handleExportCsv = async () => {
+    try {
+      haptics.medium();
+      setIsExporting(true);
+      const csvData = await apiClient.exportTransactionsCsv();
+      const filename = `expense_tracker_${new Date().toISOString().split('T')[0]}.csv`;
+
+      if (Platform.OS === 'web') {
+        const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', filename);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast('CSV report downloaded! 📊', 'success');
+      } else {
+        const file = new File(Paths.document, filename);
+        if (!file.exists) {
+          file.create();
+        }
+        file.write(csvData);
+
+        if (await Sharing.isAvailableAsync()) {
+          await Sharing.shareAsync(file.uri, {
+            mimeType: 'text/csv',
+            dialogTitle: 'Export Expense Report',
+            UTI: 'public.comma-separated-values-text',
+          });
+          showToast('CSV report ready to share! 📊', 'success');
+        } else {
+          showToast(`File saved: ${filename}`, 'success');
+        }
+      }
+    } catch (err: any) {
+      showToast(err?.message || 'Failed to export CSV report', 'error');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   if (isLoading || (!reports && !isError)) {
     return (
       <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
         <View style={styles.header}>
-          <Text variant="headingL" weight="bold">
-            Financial Reports
-          </Text>
-          <Text variant="bodySmall" color="secondary">
-            Insights and spending patterns
-          </Text>
+          <View>
+            <Text variant="headingL" weight="bold">
+              Financial Reports
+            </Text>
+            <Text variant="bodySmall" color="secondary">
+              Insights and spending patterns
+            </Text>
+          </View>
         </View>
         <ScrollView contentContainerStyle={styles.content}>
           <CardSkeleton />
@@ -75,14 +129,37 @@ export default function ReportsScreen() {
             />
           }
         >
-          {/* Screen Header */}
-          <Animated.View entering={FadeInDown.duration(300)} style={styles.header}>
-            <Text variant="headingL" weight="bold">
-              Financial Reports
-            </Text>
-            <Text variant="bodySmall" color="secondary">
-              Insights and spending patterns
-            </Text>
+          {/* Screen Header with CSV Export */}
+          <Animated.View entering={FadeInDown.duration(300)} style={styles.headerRow}>
+            <View style={{ flex: 1 }}>
+              <Text variant="headingL" weight="bold">
+                Financial Reports
+              </Text>
+              <Text variant="bodySmall" color="secondary">
+                Insights and spending patterns
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              onPress={handleExportCsv}
+              disabled={isExporting}
+              activeOpacity={0.8}
+              style={[
+                styles.exportBtn,
+                { backgroundColor: colors.primaryLight, borderColor: colors.primary },
+              ]}
+            >
+              {isExporting ? (
+                <ActivityIndicator size="small" color={colors.primary} />
+              ) : (
+                <>
+                  <Ionicons name="download-outline" size={16} color={colors.primary} />
+                  <Text variant="caption" weight="bold" color="brand">
+                    Export CSV
+                  </Text>
+                </>
+              )}
+            </TouchableOpacity>
           </Animated.View>
 
           {/* Period Selector */}
@@ -150,6 +227,23 @@ const styles = StyleSheet.create({
   header: {
     paddingVertical: spacing.sm,
     marginBottom: spacing.xs,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: spacing.sm,
+    marginBottom: spacing.xs,
+    gap: spacing.sm,
+  },
+  exportBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: radius.full,
+    borderWidth: 1,
   },
   periodSelector: {
     marginBottom: spacing.lg,

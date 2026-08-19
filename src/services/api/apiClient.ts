@@ -132,6 +132,14 @@ class ApiClient {
     }
   }
 
+  public setSessionTokens(tokens: { accessToken: string; refreshToken: string; expiresIn?: number }) {
+    this.saveTokensToStorage({
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      expiresAt: Date.now() + (tokens.expiresIn || 1800) * 1000,
+    });
+  }
+
   public async login(email: string, password: string): Promise<{ user: any }> {
     const response = await fetch(`${this.baseUrl}/auth/login`, {
       method: 'POST',
@@ -186,6 +194,43 @@ class ApiClient {
     return this.login(email, password);
   }
 
+  public async googleLogin(tokens: {
+    idToken?: string;
+    accessToken?: string;
+    code?: string;
+    redirectUri?: string;
+  }): Promise<{ user: any }> {
+    const response = await fetch(`${this.baseUrl}/auth/google`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id_token: tokens.idToken,
+        access_token: tokens.accessToken,
+        code: tokens.code,
+        redirect_uri: tokens.redirectUri,
+      }),
+    });
+
+    const data = await response.json().catch(() => null);
+    if (!response.ok) {
+      const errorDetail = data?.error;
+      throw new ApiError(
+        errorDetail?.message || 'Google sign-in failed',
+        errorDetail?.code || 'AUTH_ERROR',
+        response.status,
+        errorDetail?.fields
+      );
+    }
+
+    this.saveTokensToStorage({
+      accessToken: data.access_token,
+      refreshToken: data.refresh_token,
+      expiresAt: Date.now() + (data.expires_in || 1800) * 1000,
+    });
+
+    return data;
+  }
+
   public async logout(): Promise<void> {
     try {
       if (this.tokens?.refreshToken) {
@@ -205,9 +250,57 @@ class ApiClient {
     }
   }
 
+  public async deleteAccount(): Promise<void> {
+    await this.request<void>('/auth/account', { method: 'DELETE' });
+    this.saveTokensToStorage(null);
+  }
+
+  public async exportTransactionsCsv(): Promise<string> {
+    const token = await this.ensureAuthenticated();
+    const response = await fetch(`${this.baseUrl}/reports/export/csv`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to export CSV report');
+    }
+
+    return await response.text();
+  }
+
+  public async getRecurringTransactions(): Promise<any[]> {
+    const res = await this.request<{ items: any[] }>('/recurring-transactions');
+    return res?.items || [];
+  }
+
+  public async createRecurringTransaction(payload: any): Promise<any> {
+    return await this.request<any>('/recurring-transactions', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  public async updateRecurringTransaction(id: string, payload: any): Promise<any> {
+    return await this.request<any>(`/recurring-transactions/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  public async deleteRecurringTransaction(id: string): Promise<void> {
+    return await this.request<void>(`/recurring-transactions/${id}`, {
+      method: 'DELETE',
+    });
+  }
+
   public hasValidToken(): boolean {
     return !!this.tokens?.accessToken;
   }
+
+  private refreshPromise: Promise<void> | null = null;
 
   public async ensureAuthenticated(): Promise<string> {
     await this.initPromise;
@@ -232,27 +325,37 @@ class ApiClient {
 
   private async refreshAccessToken(): Promise<void> {
     if (!this.tokens?.refreshToken) return;
-    try {
-      const response = await fetch(`${this.baseUrl}/auth/refresh`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ refresh_token: this.tokens.refreshToken }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Refresh failed');
-      }
-
-      const data = await response.json();
-      this.saveTokensToStorage({
-        accessToken: data.access_token,
-        refreshToken: this.tokens.refreshToken,
-        expiresAt: Date.now() + data.expires_in * 1000,
-      });
-    } catch (e) {
-      this.saveTokensToStorage(null);
-      throw e;
+    if (this.refreshPromise) {
+      return this.refreshPromise;
     }
+
+    this.refreshPromise = (async () => {
+      try {
+        const response = await fetch(`${this.baseUrl}/auth/refresh`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ refresh_token: this.tokens!.refreshToken }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Refresh failed');
+        }
+
+        const data = await response.json();
+        this.saveTokensToStorage({
+          accessToken: data.access_token,
+          refreshToken: this.tokens!.refreshToken,
+          expiresAt: Date.now() + data.expires_in * 1000,
+        });
+      } catch (e) {
+        this.saveTokensToStorage(null);
+        throw e;
+      } finally {
+        this.refreshPromise = null;
+      }
+    })();
+
+    return this.refreshPromise;
   }
 
   public async request<T>(

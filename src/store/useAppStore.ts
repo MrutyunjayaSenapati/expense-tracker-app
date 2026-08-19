@@ -5,6 +5,7 @@ import { Platform } from 'react-native';
 import { CurrencyCode } from '../types/currency';
 import { TransactionFilters, TransactionSort } from '../types/transaction';
 import { notificationService } from '../services/notifications/notificationService';
+import { biometricService } from '../services/security/biometricService';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 
@@ -38,6 +39,13 @@ interface AppState {
   setNotificationsEnabled: (enabled: boolean) => Promise<boolean>;
   setDailyReminderTime: (hour: number, minute: number) => Promise<void>;
   setBudgetAlertsEnabled: (enabled: boolean) => void;
+
+  // Biometric App Lock (Persisted)
+  biometricsEnabled: boolean;
+  isAppLocked: boolean;
+  setBiometricsEnabled: (enabled: boolean) => Promise<boolean>;
+  unlockApp: () => void;
+  lockApp: () => void;
 
   // Global Lightweight Toast
   toast: ToastState;
@@ -130,6 +138,36 @@ export const useAppStore = create<AppState>()(
 
       setBudgetAlertsEnabled: (enabled: boolean) => set({ budgetAlertsEnabled: enabled }),
 
+      // Biometric App Lock
+      biometricsEnabled: false,
+      isAppLocked: false,
+
+      setBiometricsEnabled: async (enabled: boolean) => {
+        if (enabled) {
+          const available = await biometricService.isHardwareAvailable();
+          if (!available) {
+            return false;
+          }
+          const authenticated = await biometricService.authenticate('Confirm Face ID / Fingerprint to enable App Lock');
+          if (authenticated) {
+            set({ biometricsEnabled: true, isAppLocked: false });
+            return true;
+          }
+          return false;
+        } else {
+          set({ biometricsEnabled: false, isAppLocked: false });
+          return true;
+        }
+      },
+
+      unlockApp: () => set({ isAppLocked: false }),
+      lockApp: () => {
+        const { biometricsEnabled } = get();
+        if (biometricsEnabled) {
+          set({ isAppLocked: true });
+        }
+      },
+
       toast: {
         visible: false,
         message: '',
@@ -153,6 +191,7 @@ export const useAppStore = create<AppState>()(
         dailyReminderHour: state.dailyReminderHour,
         dailyReminderMinute: state.dailyReminderMinute,
         budgetAlertsEnabled: state.budgetAlertsEnabled,
+        biometricsEnabled: state.biometricsEnabled,
       }),
     }
   )

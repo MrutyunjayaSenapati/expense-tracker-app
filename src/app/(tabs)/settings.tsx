@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, ScrollView, TouchableOpacity, Switch } from 'react-native';
+import { View, StyleSheet, ScrollView, TouchableOpacity, Switch, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useUser, useUpdateCurrency } from '../../hooks/useUser';
 import { useAuth } from '../../hooks/useAuth';
@@ -23,20 +23,35 @@ export default function SettingsScreen() {
   const haptics = useHaptics();
 
   const { data: user } = useUser();
-  const { logout, isLoading: isAuthLoading } = useAuth();
+  const { logout, deleteAccount, isLoading: isAuthLoading, isDeletingAccount } = useAuth();
   const updateCurrencyMutation = useUpdateCurrency();
 
   const notificationsEnabled = useAppStore(state => state.notificationsEnabled);
   const setNotificationsEnabled = useAppStore(state => state.setNotificationsEnabled);
   const budgetAlertsEnabled = useAppStore(state => state.budgetAlertsEnabled);
   const setBudgetAlertsEnabled = useAppStore(state => state.setBudgetAlertsEnabled);
+  const biometricsEnabled = useAppStore(state => state.biometricsEnabled);
+  const setBiometricsEnabled = useAppStore(state => state.setBiometricsEnabled);
   const showToast = useAppStore(state => state.showToast);
 
   const [currencySheetVisible, setCurrencySheetVisible] = useState(false);
   const [logoutModalVisible, setLogoutModalVisible] = useState(false);
+  const [deleteAccountModalVisible, setDeleteAccountModalVisible] = useState(false);
   const [isSendingTest, setIsSendingTest] = useState(false);
 
   const currentCurrency = user?.currency || 'INR';
+
+  const handleToggleBiometrics = async (val: boolean) => {
+    haptics.selection();
+    const success = await setBiometricsEnabled(val);
+    if (val && !success) {
+      showToast('Biometrics not available or authentication cancelled', 'info');
+    } else if (val) {
+      showToast('Biometric App Lock enabled 🔒', 'success');
+    } else {
+      showToast('Biometric App Lock disabled', 'info');
+    }
+  };
 
   const handleToggleNotifications = async (val: boolean) => {
     haptics.selection();
@@ -78,6 +93,16 @@ export default function SettingsScreen() {
     await logout();
   };
 
+  const handleDeleteAccount = async () => {
+    try {
+      haptics.medium();
+      await deleteAccount();
+      setDeleteAccountModalVisible(false);
+    } catch {
+      // Handled in mutation onError
+    }
+  };
+
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: colors.background }]}
@@ -86,14 +111,22 @@ export default function SettingsScreen() {
       {/* Profile Card */}
       <Card elevation="sm" style={styles.profileCard}>
         <View style={[styles.avatarCircle, { backgroundColor: colors.primaryLight }]}>
-          <Ionicons name="person" size={32} color={colors.primary} />
+          {user?.avatarUrl ? (
+            <Image
+              source={{ uri: user.avatarUrl }}
+              style={styles.avatarImage}
+              resizeMode="cover"
+            />
+          ) : (
+            <Ionicons name="person" size={32} color={colors.primary} />
+          )}
         </View>
         <View style={styles.profileInfo}>
           <Text variant="headingM" weight="bold">
-            {user?.name || 'Mrutyunjaya Senapati'}
+            {user?.name || 'User'}
           </Text>
           <Text variant="bodySmall" color="secondary">
-            {user?.email || 'mrutyunjaya.senapati@example.com'}
+            {user?.email || ''}
           </Text>
         </View>
       </Card>
@@ -249,6 +282,35 @@ export default function SettingsScreen() {
         </TouchableOpacity>
       </Card>
 
+      {/* Security & Privacy Section */}
+      <Text variant="label" color="secondary" style={styles.sectionHeader}>
+        SECURITY & PRIVACY
+      </Text>
+      <Card elevation="none" style={styles.menuCard}>
+        {/* Biometric App Lock */}
+        <View style={styles.menuItem}>
+          <View style={styles.menuLeft}>
+            <View style={[styles.menuIcon, { backgroundColor: colors.primaryLight }]}>
+              <Ionicons name="finger-print-outline" size={20} color={colors.primary} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text variant="bodyLarge" weight="semibold">
+                Biometric App Lock
+              </Text>
+              <Text variant="caption" color="secondary">
+                Require Face ID / Fingerprint to open app
+              </Text>
+            </View>
+          </View>
+          <Switch
+            value={biometricsEnabled}
+            onValueChange={handleToggleBiometrics}
+            trackColor={{ false: colors.surfaceMuted, true: colors.primary }}
+            thumbColor="#FFFFFF"
+          />
+        </View>
+      </Card>
+
       {/* Financial Management Section */}
       <Text variant="label" color="secondary" style={styles.sectionHeader}>
         FINANCIAL MANAGEMENT
@@ -291,6 +353,29 @@ export default function SettingsScreen() {
         <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
         <TouchableOpacity
+          onPress={() => router.push('/subscriptions' as any)}
+          activeOpacity={0.7}
+          style={styles.menuItem}
+        >
+          <View style={styles.menuLeft}>
+            <View style={[styles.menuIcon, { backgroundColor: colors.streakSoft || 'rgba(255, 107, 0, 0.15)' }]}>
+              <Ionicons name="repeat-outline" size={20} color={colors.streakOrange || '#FF6B00'} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text variant="bodyLarge" weight="semibold">
+                Subscriptions & Bills
+              </Text>
+              <Text variant="caption" color="secondary">
+                Manage recurring monthly commitments
+              </Text>
+            </View>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={colors.textTertiary} />
+        </TouchableOpacity>
+
+        <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+        <TouchableOpacity
           onPress={() => router.push('/categories')}
           activeOpacity={0.7}
           style={styles.menuItem}
@@ -309,23 +394,53 @@ export default function SettingsScreen() {
 
       {/* Account Actions Section */}
       <Text variant="label" color="secondary" style={styles.sectionHeader}>
-        ACCOUNT
+        ACCOUNT & DANGER ZONE
       </Text>
       <Card elevation="none" style={styles.menuCard}>
+        {/* Log Out */}
         <TouchableOpacity
           onPress={() => setLogoutModalVisible(true)}
           activeOpacity={0.7}
           style={styles.menuItem}
         >
           <View style={styles.menuLeft}>
-            <View style={[styles.menuIcon, { backgroundColor: colors.expenseSoft }]}>
-              <Ionicons name="log-out-outline" size={20} color={colors.expense} />
+            <View style={[styles.menuIcon, { backgroundColor: colors.surfaceMuted }]}>
+              <Ionicons name="log-out-outline" size={20} color={colors.textPrimary} />
             </View>
-            <Text variant="bodyLarge" weight="semibold" color="expense">
-              Log Out
-            </Text>
+            <View style={{ flex: 1 }}>
+              <Text variant="bodyLarge" weight="semibold">
+                Log Out
+              </Text>
+              <Text variant="caption" color="secondary">
+                Sign out of this device
+              </Text>
+            </View>
           </View>
           <Ionicons name="chevron-forward" size={18} color={colors.textTertiary} />
+        </TouchableOpacity>
+
+        <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+        {/* Delete Account */}
+        <TouchableOpacity
+          onPress={() => setDeleteAccountModalVisible(true)}
+          activeOpacity={0.7}
+          style={styles.menuItem}
+        >
+          <View style={styles.menuLeft}>
+            <View style={[styles.menuIcon, { backgroundColor: colors.expenseSoft }]}>
+              <Ionicons name="trash-outline" size={20} color={colors.expense} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text variant="bodyLarge" weight="semibold" color="expense">
+                Delete Account & Data
+              </Text>
+              <Text variant="caption" color="secondary">
+                Permanently erase all your records
+              </Text>
+            </View>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={colors.expense} />
         </TouchableOpacity>
       </Card>
 
@@ -391,6 +506,19 @@ export default function SettingsScreen() {
         onConfirm={handleLogout}
         onCancel={() => setLogoutModalVisible(false)}
       />
+
+      {/* Delete Account Confirmation Modal */}
+      <ConfirmationModal
+        visible={deleteAccountModalVisible}
+        title="Permanently Delete Account?"
+        message="This action CANNOT be undone. All your transactions, budgets, accounts, recurring payments, and streak achievements will be permanently erased."
+        confirmLabel="Delete Everything"
+        cancelLabel="Keep My Account"
+        isDestructive={true}
+        loading={isDeletingAccount}
+        onConfirm={handleDeleteAccount}
+        onCancel={() => setDeleteAccountModalVisible(false)}
+      />
     </ScrollView>
   );
 }
@@ -420,6 +548,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.lg,
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 30,
   },
   profileInfo: {
     flex: 1,

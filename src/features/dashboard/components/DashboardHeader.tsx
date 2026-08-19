@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useTheme } from '../../../hooks/useTheme';
 import { spacing } from '../../../theme/spacing';
 import { radius } from '../../../theme/radius';
@@ -75,7 +75,15 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           accessibilityLabel="Go to Profile and Settings"
           style={[styles.avatar, { borderColor: colors.primary, backgroundColor: colors.primaryLight }]}
         >
-          <Ionicons name="person" size={16} color={colors.primary} />
+          {user?.avatarUrl ? (
+            <Image
+              source={{ uri: user.avatarUrl }}
+              style={styles.avatarImage}
+              resizeMode="cover"
+            />
+          ) : (
+            <Ionicons name="person" size={16} color={colors.primary} />
+          )}
         </AnimatedPressable>
       </View>
     </View>
@@ -145,5 +153,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1.5,
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 17,
   },
 });

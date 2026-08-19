@@ -10,21 +10,27 @@ import {
 import { useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp, LinearTransition } from 'react-native-reanimated';
+import * as WebBrowser from 'expo-web-browser';
+import * as Linking from 'expo-linking';
 import { useTheme } from '../../hooks/useTheme';
 import { useAuth } from '../../hooks/useAuth';
 import { useHaptics } from '../../hooks/useHaptics';
+import { apiClient } from '../../services/api/apiClient';
 import { spacing } from '../../theme/spacing';
 import { radius } from '../../theme/radius';
 import { Text } from '../../components/ui/Text';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { BrandLogo } from '../../components/ui/BrandLogo';
+import { GoogleSignInButton } from '../../components/ui/GoogleSignInButton';
 import { Ionicons } from '@expo/vector-icons';
+
+WebBrowser.maybeCompleteAuthSession();
 
 export default function AuthScreen() {
   const params = useLocalSearchParams();
   const { colors } = useTheme();
-  const { login, register, isLoading } = useAuth();
+  const { login, register, googleLogin, checkAuth, isLoading, isGoogleLoading } = useAuth();
   const haptics = useHaptics();
 
   // Tab state: 'login' | 'register'
@@ -39,6 +45,81 @@ export default function AuthScreen() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+
+  // Google OAuth Session
+  const googleClientId =
+    process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID ||
+    '1034897317741-hacdelsguobptpkjmp3fujjk2k2guhfu.apps.googleusercontent.com';
+
+  const handleGoogleSignIn = async () => {
+    setError('');
+    try {
+      // 1. Deep link URL that bounces back into the mobile app (or web origin)
+      const appRedirectUrl = Platform.OS === 'web'
+        ? (typeof window !== 'undefined' ? `${window.location.origin}` : 'http://localhost:8081')
+        : Linking.createURL('oauth');
+
+      // 2. Google OAuth registered callback URI
+      const backendBaseUrl = apiClient.getBaseUrl();
+      const googleRedirectUri = Platform.OS === 'web'
+        ? appRedirectUrl
+        : `${backendBaseUrl}/auth/google/callback`;
+
+      // 3. Construct OAuth URL with response_type=token id_token
+      const authUrl =
+        `https://accounts.google.com/o/oauth2/v2/auth?` +
+        `client_id=${encodeURIComponent(googleClientId)}` +
+        `&redirect_uri=${encodeURIComponent(googleRedirectUri)}` +
+        `&response_type=token%20id_token` +
+        `&scope=${encodeURIComponent('openid email profile')}` +
+        `&state=${encodeURIComponent(appRedirectUrl)}` +
+        `&nonce=${Math.random().toString(36).substring(2)}` +
+        `&prompt=select_account`;
+
+      if (__DEV__) {
+        console.log('🔗 [Google Sign-In] redirect_uri sent to Google:', googleRedirectUri);
+      }
+
+      // 4. Open in-app browser and listen for return to appRedirectUrl
+      const result = await WebBrowser.openAuthSessionAsync(authUrl, appRedirectUrl);
+
+      if (result.type === 'success' && result.url) {
+        const url = result.url;
+        let accessToken: string | undefined;
+        let refreshToken: string | undefined;
+        let idToken: string | undefined;
+
+        const parsed = Linking.parse(url);
+        if (parsed.queryParams) {
+          accessToken = (parsed.queryParams.access_token as string) || undefined;
+          refreshToken = (parsed.queryParams.refresh_token as string) || undefined;
+          idToken = (parsed.queryParams.id_token as string) || undefined;
+        }
+
+        if (url.includes('#')) {
+          const fragment = url.split('#')[1];
+          const searchParams = new URLSearchParams(fragment);
+          accessToken = searchParams.get('access_token') || accessToken;
+          refreshToken = searchParams.get('refresh_token') || refreshToken;
+          idToken = searchParams.get('id_token') || idToken;
+        }
+
+        if (accessToken && refreshToken) {
+          apiClient.setSessionTokens({ accessToken, refreshToken, expiresIn: 1800 });
+          await checkAuth();
+          return;
+        }
+
+        if (idToken || accessToken) {
+          await googleLogin({ idToken, accessToken, redirectUri: googleRedirectUri });
+        } else {
+          setError('No authentication token received from Google.');
+        }
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to complete Google Sign-In');
+    }
+  };
 
   // Password validation checks for Sign Up
   const hasMinLength = password.length >= 6;
@@ -277,7 +358,7 @@ export default function AuthScreen() {
               {/* Submit CTA */}
               <Button
                 onPress={handleSubmit}
-                loading={isLoading}
+                loading={isLoading && !isGoogleLoading}
                 variant="primary"
                 fullWidth
                 size="lg"
@@ -286,6 +367,28 @@ export default function AuthScreen() {
               >
                 {activeTab === 'login' ? 'Sign In' : 'Create Account'}
               </Button>
+
+              {/* Divider */}
+              <View style={styles.dividerContainer}>
+                <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+                <Text
+                  variant="caption"
+                  color="tertiary"
+                  weight="semibold"
+                  style={styles.dividerText}
+                >
+                  OR CONTINUE WITH
+                </Text>
+                <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+              </View>
+
+              {/* Google Sign-In Button */}
+              <GoogleSignInButton
+                onPress={handleGoogleSignIn}
+                loading={isGoogleLoading}
+                disabled={isLoading}
+                text={activeTab === 'login' ? 'Sign in with Google' : 'Sign up with Google'}
+              />
 
               {/* Bottom Toggle Prompt */}
               <TouchableOpacity
@@ -393,6 +496,20 @@ const styles = StyleSheet.create({
   },
   submitBtn: {
     marginTop: spacing.md,
+  },
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: spacing.lg,
+    gap: spacing.md,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+  },
+  dividerText: {
+    fontSize: 11,
+    letterSpacing: 0.8,
   },
   togglePrompt: {
     alignItems: 'center',

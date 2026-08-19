@@ -43,6 +43,21 @@ export interface TransactionFormProps {
   mode?: 'create' | 'edit';
 }
 
+const EXPENSE_PRESETS = [
+  { label: '☕ Coffee', amount: 5, categoryKeyword: 'Food', merchant: 'Coffee' },
+  { label: '🥪 Lunch', amount: 15, categoryKeyword: 'Food', merchant: 'Lunch' },
+  { label: '⛽ Fuel', amount: 40, categoryKeyword: 'Transport', merchant: 'Fuel' },
+  { label: '🛒 Grocery', amount: 50, categoryKeyword: 'Groceries', merchant: 'Groceries' },
+  { label: '🎬 Movie', amount: 20, categoryKeyword: 'Entertainment', merchant: 'Cinema' },
+];
+
+const INCOME_PRESETS = [
+  { label: '💼 Salary', amount: 3000, categoryKeyword: 'Salary', merchant: 'Salary' },
+  { label: '💻 Freelance', amount: 250, categoryKeyword: 'Freelance', merchant: 'Freelance' },
+  { label: '🎁 Gift', amount: 100, categoryKeyword: 'Gift', merchant: 'Gift' },
+  { label: '📈 Dividend', amount: 50, categoryKeyword: 'Investment', merchant: 'Dividend' },
+];
+
 export const TransactionForm: React.FC<TransactionFormProps> = ({
   initialValues,
   categories,
@@ -90,6 +105,23 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
   const selectedCategoryId = watch('categoryId');
   const selectedAccountId = watch('accountId');
   const selectedDate = watch('date');
+
+  const presets = selectedType === 'expense' ? EXPENSE_PRESETS : INCOME_PRESETS;
+
+  const handleApplyPreset = (preset: typeof EXPENSE_PRESETS[0]) => {
+    haptics.selection();
+    setAmountText(String(preset.amount));
+    setValue('amount', preset.amount, { shouldValidate: true });
+    if (preset.merchant) {
+      setValue('merchant', preset.merchant);
+    }
+    const matchedCategory = categories.find(
+      c => c.type === selectedType && c.name.toLowerCase().includes(preset.categoryKeyword.toLowerCase())
+    );
+    if (matchedCategory) {
+      setValue('categoryId', matchedCategory.id);
+    }
+  };
 
   const availableCategories = useMemo(() => {
     return categories
@@ -208,6 +240,38 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
                 {errors.amount.message}
               </Text>
             )}
+          </View>
+
+          {/* 1-Tap Quick Presets */}
+          <View style={styles.presetsContainer}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.presetsScroll}
+            >
+              {presets.map((p, idx) => (
+                <TouchableOpacity
+                  key={idx}
+                  onPress={() => handleApplyPreset(p)}
+                  activeOpacity={0.7}
+                  style={[
+                    styles.presetChip,
+                    { backgroundColor: colors.surface, borderColor: colors.border },
+                  ]}
+                >
+                  <Text variant="caption" weight="bold" color="primary">
+                    {p.label}
+                  </Text>
+                  <Text
+                    variant="caption"
+                    weight="bold"
+                    style={{ color: colors.primary, fontSize: 11, marginLeft: 4 }}
+                  >
+                    ${p.amount}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
           </View>
 
           {/* Quick Category Selection Bar */}
@@ -648,6 +712,21 @@ const styles = StyleSheet.create({
   },
   errorText: {
     marginTop: spacing.xs,
+  },
+  presetsContainer: {
+    marginBottom: spacing.xs + 2,
+  },
+  presetsScroll: {
+    gap: spacing.xs + 2,
+    paddingVertical: 2,
+  },
+  presetChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: radius.full,
+    borderWidth: 1,
   },
   quickCategoryContainer: {
     marginBottom: spacing.md,

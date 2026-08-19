@@ -12,8 +12,11 @@ import {
   Inter_700Bold,
   Inter_800ExtraBold,
 } from '@expo-google-fonts/inter';
+import { AppState, type AppStateStatus } from 'react-native';
 import { Toast } from '../components/ui/Toast';
+import { BiometricLockOverlay } from '../components/ui/BiometricLockOverlay';
 import { useAuthStore } from '../store/useAuthStore';
+import { useAppStore } from '../store/useAppStore';
 import { useTheme } from '../hooks/useTheme';
 import { notificationService } from '../services/notifications/notificationService';
 
@@ -118,6 +121,19 @@ function ProtectedNavigation() {
         }}
       />
       <Stack.Screen
+        name="subscriptions/index"
+        options={{
+          title: 'Subscriptions & Bills',
+        }}
+      />
+      <Stack.Screen
+        name="subscriptions/create"
+        options={{
+          title: 'Add Subscription',
+          presentation: 'modal',
+        }}
+      />
+      <Stack.Screen
         name="auth/login"
         options={{
           headerShown: false,
@@ -141,6 +157,24 @@ function ProtectedNavigation() {
 
 function RootLayoutNav() {
   const { isDark } = useTheme();
+  const lockApp = useAppStore(state => state.lockApp);
+  const biometricsEnabled = useAppStore(state => state.biometricsEnabled);
+
+  useEffect(() => {
+    if (biometricsEnabled) {
+      lockApp();
+    }
+
+    const subscription = AppState.addEventListener('change', (nextAppState: AppStateStatus) => {
+      if (nextAppState === 'active' && biometricsEnabled) {
+        lockApp();
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [biometricsEnabled, lockApp]);
 
   return (
     <>
@@ -148,6 +182,7 @@ function RootLayoutNav() {
         style={isDark ? 'light' : 'dark'}
       />
       <Toast />
+      <BiometricLockOverlay />
       <ProtectedNavigation />
     </>
   );

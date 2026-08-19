@@ -12,6 +12,7 @@ import { spacing } from '../../theme/spacing';
 import { AmbientMeshBackground } from '../../components/ui/AmbientMeshBackground';
 import { DashboardHeader } from '../../features/dashboard/components/DashboardHeader';
 import { FinancialSummaryCard } from '../../features/dashboard/components/FinancialSummaryCard';
+import { HabitStreakCard } from '../../features/dashboard/components/HabitStreakCard';
 import { IncomeExpenseCard } from '../../features/dashboard/components/IncomeExpenseCard';
 import { MonthlyBudgetCard } from '../../features/dashboard/components/MonthlyBudgetCard';
 import { SpendingByCategoryCard } from '../../features/dashboard/components/SpendingByCategoryCard';
@@ -38,21 +39,25 @@ export default function HomeScreen() {
   if (isDashboardLoading || (!dashboard && !isError)) {
     return (
       <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-        <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-          <CardSkeleton />
-          <CardSkeleton />
+        <AmbientMeshBackground />
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+          <CardSkeleton style={{ height: 60 }} />
+          <CardSkeleton style={{ height: 140 }} />
+          <CardSkeleton style={{ height: 100 }} />
+          <CardSkeleton style={{ height: 120 }} />
           <ListSkeleton count={4} />
         </ScrollView>
       </SafeAreaView>
     );
   }
 
-  if (isError) {
+  if (isError || !dashboard) {
     return (
       <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
+        <AmbientMeshBackground />
         <ErrorState
-          title="Could not load Dashboard"
-          message="Unable to calculate financial summary. Please retry."
+          title="Could not load dashboard"
+          message="Please check your connection and try again"
           onRetry={refetch}
         />
       </SafeAreaView>
@@ -60,7 +65,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={['top']}>
       <AmbientMeshBackground>
         <ScrollView
           style={styles.container}
@@ -81,6 +86,7 @@ export default function HomeScreen() {
               user={user}
               streakDays={dashboard.streakDays}
               onProfilePress={() => router.push('/(tabs)/settings')}
+              onNotificationPress={() => router.push('/(tabs)/settings')}
             />
           </Animated.View>
 
@@ -94,8 +100,16 @@ export default function HomeScreen() {
             />
           </Animated.View>
 
+          {/* Habit Streak & Monthly Savings Highlights */}
+          <Animated.View entering={FadeInDown.duration(400).delay(100)}>
+            <HabitStreakCard
+              streakDays={dashboard.streakDays}
+              netSavings={dashboard.netSavings}
+            />
+          </Animated.View>
+
           {/* Dual Cashflow Summary */}
-          <Animated.View entering={FadeInDown.duration(400).delay(120)}>
+          <Animated.View entering={FadeInDown.duration(400).delay(130)}>
             <IncomeExpenseCard
               totalIncome={dashboard.totalIncome}
               totalExpense={dashboard.totalExpense}

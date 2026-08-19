@@ -19,7 +19,9 @@ export const HabitStreakCard: React.FC<HabitStreakCardProps> = ({
 }) => {
   const { colors } = useTheme();
 
-  const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  const dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  const fullDayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const todayIndex = new Date().getDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
   const hasStreak = streakDays > 0;
   const hasSavings = netSavings > 0;
 
@@ -45,35 +47,58 @@ export const HabitStreakCard: React.FC<HabitStreakCardProps> = ({
             </View>
           </View>
           <Text variant="caption" color="secondary" style={styles.subtitle} numberOfLines={1}>
-            {hasStreak ? 'Building a great habit' : 'Log a transaction today'}
+            {hasStreak ? `Active • ${fullDayNames[todayIndex]}` : 'Log today to start streak'}
           </Text>
 
-          {/* Dynamic Days Bubbles */}
+          {/* Dynamic Days of Current Week */}
           <View style={styles.daysRow}>
-            {days.map((day, i) => {
-              const isActive = i < Math.min(streakDays, 7);
+            {dayNames.map((day, i) => {
+              const isToday = i === todayIndex;
+              const isPastOrToday = i <= todayIndex;
+              const isActive = isPastOrToday && (todayIndex - i) < streakDays;
+
               return (
                 <View
                   key={i}
                   style={[
                     styles.dayBubble,
                     {
-                      backgroundColor: isActive ? (colors.streakOrange || '#FF6B00') : colors.surfaceMuted,
-                      borderColor: isActive ? '#FFA14A' : 'transparent',
-                      borderWidth: isActive ? 1 : 0,
+                      backgroundColor: isActive
+                        ? (colors.streakOrange || '#FF6B00')
+                        : isToday
+                        ? colors.surfaceMuted
+                        : 'transparent',
+                      borderColor: isToday
+                        ? (colors.streakOrange || '#FF6B00')
+                        : isActive
+                        ? '#FFA14A'
+                        : colors.border,
+                      borderWidth: isToday ? 2 : isActive ? 1 : 0.8,
                     },
                   ]}
                 >
                   <Text
                     variant="caption"
-                    weight="bold"
+                    weight={isToday || isActive ? 'bold' : 'regular'}
                     style={{
-                      color: isActive ? '#FFFFFF' : colors.textTertiary,
-                      fontSize: 9,
+                      color: isActive
+                        ? '#FFFFFF'
+                        : isToday
+                        ? (colors.streakOrange || '#FF6B00')
+                        : colors.textTertiary,
+                      fontSize: 10,
                     }}
                   >
                     {day}
                   </Text>
+                  {isToday && (
+                    <View
+                      style={[
+                        styles.todayIndicator,
+                        { backgroundColor: isActive ? '#FFFFFF' : (colors.streakOrange || '#FF6B00') },
+                      ]}
+                    />
+                  )}
                 </View>
               );
             })}
@@ -120,8 +145,8 @@ export const HabitStreakCard: React.FC<HabitStreakCardProps> = ({
               }}
             >
               {hasSavings
-                ? `Saved ₹${netSavings.toLocaleString('en-IN')}`
-                : '₹0 Saved this month'}
+                ? `Saved $${netSavings.toLocaleString('en-US')}`
+                : '$0 Saved this month'}
             </Text>
           </View>
         </Card>
@@ -196,11 +221,19 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   dayBubble: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'relative',
+  },
+  todayIndicator: {
+    width: 3,
+    height: 3,
+    borderRadius: 1.5,
+    position: 'absolute',
+    bottom: 1,
   },
   savedBadge: {
     flexDirection: 'row',

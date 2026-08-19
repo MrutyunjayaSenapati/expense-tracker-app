@@ -19,3 +19,5 @@ export * from './AnimatedNumber';
 export * from './Icon';
 export * from './LottieAnimation';
 export * from './SwipeableRow';
+export * from './GoogleSignInButton';
+export * from './BiometricLockOverlay';
