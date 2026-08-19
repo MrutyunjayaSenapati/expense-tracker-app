@@ -1,6 +1,6 @@
 import React from 'react';
-import { Text as RNText, TextProps as RNTextProps, TextStyle } from 'react-native';
-import { typography, fontWeights, FontWeight } from '../../theme/typography';
+import { Text as RNText, TextProps as RNTextProps, TextStyle, Platform } from 'react-native';
+import { typography, fontWeights, fontFamilies, FontWeight } from '../../theme/typography';
 import { useTheme } from '../../hooks/useTheme';
 
 export type TextVariant = keyof typeof typography;
@@ -51,12 +51,16 @@ export const Text: React.FC<TextProps> = ({
 
   const baseTypography = typography[variant];
   const textColor = colorMap[color] || colors.textPrimary;
-  const fontWeight = weight ? fontWeights[weight] : baseTypography.fontWeight;
+
+  let fontFamily = baseTypography.fontFamily;
+  if (weight && fontFamilies[weight]) {
+    fontFamily = fontFamilies[weight];
+  }
 
   const combinedStyle: TextStyle = {
     ...baseTypography,
+    fontFamily,
     color: textColor,
-    fontWeight,
     ...(align ? { textAlign: align } : {}),
   };
 

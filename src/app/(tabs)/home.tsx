@@ -11,12 +11,10 @@ import { useTheme } from '../../hooks/useTheme';
 import { spacing } from '../../theme/spacing';
 import { AmbientMeshBackground } from '../../components/ui/AmbientMeshBackground';
 import { DashboardHeader } from '../../features/dashboard/components/DashboardHeader';
-import { RevolutHeroSection } from '../../features/dashboard/components/RevolutHeroSection';
-import { RevolutVaultsCarousel } from '../../features/dashboard/components/RevolutVaultsCarousel';
-import { RevolutSpendVelocityBar } from '../../features/dashboard/components/RevolutSpendVelocityBar';
-import { HabitStreakCard } from '../../features/dashboard/components/HabitStreakCard';
-import { IncomeExpenseCard } from '../../features/dashboard/components/IncomeExpenseCard';
-import { MonthlyBudgetCard } from '../../features/dashboard/components/MonthlyBudgetCard';
+import { MonthlySpendHero } from '../../features/dashboard/components/MonthlySpendHero';
+import { QuickActionDock } from '../../features/dashboard/components/QuickActionDock';
+import { SharedDebtsBanner } from '../../features/dashboard/components/SharedDebtsBanner';
+import { CategorySpendVelocityBar } from '../../features/dashboard/components/CategorySpendVelocityBar';
 import { RecentTransactionsSection } from '../../features/dashboard/components/RecentTransactionsSection';
 import { CardSkeleton, ListSkeleton } from '../../components/ui/LoadingState';
 import { ErrorState } from '../../components/ui/ErrorState';
@@ -43,9 +41,9 @@ export default function HomeScreen() {
         <AmbientMeshBackground />
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
           <CardSkeleton style={{ height: 60 }} />
-          <CardSkeleton style={{ height: 140 }} />
+          <CardSkeleton style={{ height: 160 }} />
+          <CardSkeleton style={{ height: 50 }} />
           <CardSkeleton style={{ height: 100 }} />
-          <CardSkeleton style={{ height: 120 }} />
           <ListSkeleton count={4} />
         </ScrollView>
       </SafeAreaView>
@@ -81,8 +79,8 @@ export default function HomeScreen() {
             />
           }
         >
-          {/* 1. Revolut Top Header */}
-          <Animated.View entering={FadeInDown.duration(350).delay(30)}>
+          {/* 1. Header (User profile, Greeting, Notifications) */}
+          <Animated.View entering={FadeInDown.duration(350).delay(20)}>
             <DashboardHeader
               user={user}
               streakDays={dashboard.streakDays}
@@ -91,51 +89,31 @@ export default function HomeScreen() {
             />
           </Animated.View>
 
-          {/* 2. Revolut Borderless Hero Balance & 4 Action Circles */}
-          <Animated.View entering={FadeInDown.duration(400).delay(60)}>
-            <RevolutHeroSection
-              totalBalance={dashboard.totalBalance}
-              netSavings={dashboard.netSavings}
-              accounts={accounts}
-              onAddExpense={() => router.push('/(tabs)/add')}
-            />
-          </Animated.View>
+          {/* 2. Monthly Spend Hero (Outflow, Income vs Outflow, Budget, Safe Daily Spend) */}
+          <MonthlySpendHero
+            monthlyExpense={dashboard.totalExpense}
+            monthlyIncome={dashboard.totalIncome}
+            totalBudget={dashboard.monthlyBudget}
+            budgetSpent={dashboard.totalExpense}
+            onSetBudget={() => router.push('/budgets')}
+          />
 
-          {/* 3. Revolut Vaults & Pockets Carousel (Savings Goals) */}
-          <Animated.View entering={FadeInDown.duration(400).delay(90)}>
-            <RevolutVaultsCarousel />
-          </Animated.View>
+          {/* 3. Quick Action Dock (Add Expense, Split Bill, Room Groups) */}
+          <QuickActionDock
+            onAddExpense={() => router.push('/(tabs)/add')}
+          />
 
-          {/* 4. Revolut Smart Spend Velocity Bar */}
+          {/* 4. Social Ledger & Shared Debts (You are owed vs You owe) */}
+          <SharedDebtsBanner />
+
+          {/* 5. Top Spending Categories Velocity Bar */}
+          <CategorySpendVelocityBar
+            transactions={dashboard.recentTransactions}
+            categories={categories}
+          />
+
+          {/* 6. Categorized Recent Transactions Activity */}
           <Animated.View entering={FadeInDown.duration(400).delay(120)}>
-            <RevolutSpendVelocityBar
-              totalSpentThisMonth={dashboard.totalExpense}
-              totalMonthlyBudget={dashboard.monthlyBudget || 0}
-            />
-          </Animated.View>
-
-          {/* 5. Habit Streak Highlight */}
-          <Animated.View entering={FadeInDown.duration(400).delay(150)}>
-            <HabitStreakCard
-              streakDays={dashboard.streakDays}
-              netSavings={dashboard.netSavings}
-            />
-          </Animated.View>
-
-          {/* 6. Dual Cashflow Card */}
-          <Animated.View entering={FadeInDown.duration(400).delay(180)}>
-            <IncomeExpenseCard
-              totalIncome={dashboard.totalIncome}
-              totalExpense={dashboard.totalExpense}
-              netSavings={dashboard.netSavings}
-              savingsRate={dashboard.savingsRate}
-              incomeCount={dashboard.incomeCount}
-              expenseCount={dashboard.expenseCount}
-            />
-          </Animated.View>
-
-          {/* 7. Grouped Recent Transactions Feed */}
-          <Animated.View entering={FadeInDown.duration(400).delay(210)}>
             <RecentTransactionsSection
               transactions={dashboard.recentTransactions}
               categories={categories}
