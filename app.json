@@ -45,6 +45,12 @@
           "icon": "./assets/images/app-logo.png",
           "color": "#4F46E5"
         }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow $(PRODUCT_NAME) to use Face ID or Biometrics to securely protect your financial data."
+        }
       ]
     ],
     "experiments": {
