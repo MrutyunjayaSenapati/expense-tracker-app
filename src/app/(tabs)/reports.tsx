@@ -54,7 +54,7 @@ export default function ReportsScreen() {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        showToast('CSV report downloaded! 📊', 'success');
+        showToast('CSV report downloaded successfully', 'success');
       } else {
         const file = new File(Paths.document, filename);
         if (!file.exists) {
@@ -68,7 +68,7 @@ export default function ReportsScreen() {
             dialogTitle: 'Export Expense Report',
             UTI: 'public.comma-separated-values-text',
           });
-          showToast('CSV report ready to share! 📊', 'success');
+          showToast('CSV report ready to share', 'success');
         } else {
           showToast(`File saved: ${filename}`, 'success');
         }

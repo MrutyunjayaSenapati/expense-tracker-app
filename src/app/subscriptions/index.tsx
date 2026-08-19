@@ -34,7 +34,7 @@ function getDaysUntil(dateStr: string): { text: string; isUrgent: boolean } {
     const diffTime = target.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 0) return { text: 'Due today! ⚡', isUrgent: true };
+    if (diffDays === 0) return { text: 'Due today', isUrgent: true };
     if (diffDays === 1) return { text: 'Due tomorrow', isUrgent: true };
     if (diffDays > 1 && diffDays <= 5) return { text: `Due in ${diffDays} days`, isUrgent: true };
     if (diffDays > 5) return { text: `Renews on ${target.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`, isUrgent: false };

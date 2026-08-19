@@ -172,12 +172,12 @@ export const RevolutHeroSection: React.FC<RevolutHeroSectionProps> = ({
           </Text>
         </View>
 
-        {/* Button 2: Transfer / Log */}
+        {/* Button 2: Split / Transfer */}
         <View style={styles.actionCol}>
           <TouchableOpacity
             onPress={() => {
               haptics.light();
-              router.push('/(tabs)/add');
+              router.push('/splits' as any);
             }}
             activeOpacity={0.8}
             style={[
@@ -188,12 +188,12 @@ export const RevolutHeroSection: React.FC<RevolutHeroSectionProps> = ({
               },
             ]}
             accessibilityRole="button"
-            accessibilityLabel="Transfer"
+            accessibilityLabel="Split Expenses and Shared Bills"
           >
             <Ionicons name="swap-horizontal" size={22} color={colors.textPrimary} />
           </TouchableOpacity>
           <Text variant="caption" weight="semibold" color="secondary" style={styles.actionLabel}>
-            Transfer
+            Split / Pay
           </Text>
         </View>
 

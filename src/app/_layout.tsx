@@ -134,6 +134,59 @@ function ProtectedNavigation() {
         }}
       />
       <Stack.Screen
+        name="splits/index"
+        options={{
+          title: 'Split Expenses',
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="splits/create"
+        options={{
+          title: 'Split Expense',
+          headerShown: false,
+          presentation: 'modal',
+        }}
+      />
+      <Stack.Screen
+        name="groups/index"
+        options={{
+          title: 'Shared Groups',
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="groups/create"
+        options={{
+          title: 'Create Group',
+          headerShown: false,
+          presentation: 'modal',
+        }}
+      />
+      <Stack.Screen
+        name="groups/join"
+        options={{
+          title: 'Join Group',
+          headerShown: false,
+          presentation: 'modal',
+        }}
+      />
+      <Stack.Screen
+        name="groups/[id]/index"
+        options={{
+          title: 'Group Dashboard',
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="groups/[id]/add-expense"
+        options={{
+          title: 'Add Group Expense',
+          headerShown: false,
+          presentation: 'modal',
+        }}
+      />
+      <Stack.Screen
         name="auth/login"
         options={{
           headerShown: false,

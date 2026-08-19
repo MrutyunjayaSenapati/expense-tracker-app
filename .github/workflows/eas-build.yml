@@ -1,14 +1,20 @@
-name: EAS Build CI/CD
+name: EAS CI/CD & Auto Updates
 
 on:
   push:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      build_apk:
+        description: 'Build a fresh standalone Android APK file?'
+        required: true
+        type: boolean
+        default: false
 
 jobs:
-  build:
-    name: Build Android APK
+  ota_update:
+    name: 🚀 Push Over-The-Air Auto Update
     runs-on: ubuntu-latest
     steps:
       - name: 🏗 Checkout Repository
@@ -28,10 +34,33 @@ jobs:
       - name: 📥 Install Dependencies
         run: npm install
 
-      - name: ⚙️ Configure EAS Project
+      - name: 🚀 Publish Instant OTA Update
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: npx eas-cli init --account mrnobody007 --non-interactive || true
+        run: npx eas-cli update --branch preview --auto --non-interactive
+
+  build_apk:
+    name: 📱 Build Android APK
+    needs: ota_update
+    if: github.event.inputs.build_apk == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🏗 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: 📦 Setup Expo & EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: 📥 Install Dependencies
+        run: npm install
 
       - name: 🚀 Trigger EAS Android Preview Build
         env:

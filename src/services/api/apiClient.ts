@@ -98,7 +98,7 @@ class ApiClient {
       }
 
       if (__DEV__ && this.tokens?.accessToken) {
-        console.log('🔑 [Auth Token Loaded from SecureStore]', {
+        console.log('[Auth Token Loaded from SecureStore]', {
           hasToken: true,
           expiresInMinutes: Math.round((this.tokens.expiresAt - Date.now()) / 60000),
           expiresAt: new Date(this.tokens.expiresAt).toLocaleTimeString(),
@@ -296,6 +296,85 @@ class ApiClient {
     });
   }
 
+  // Split Expense & Bill Sharing
+  public async getSplitBills(status?: string): Promise<any[]> {
+    const query = status ? `?status=${status}` : '';
+    const res = await this.request<any[]>(`/splits${query}`);
+    return res || [];
+  }
+
+  public async getSplitSummary(): Promise<any> {
+    return await this.request<any>('/splits/summary');
+  }
+
+  public async getSplitBill(id: string): Promise<any> {
+    return await this.request<any>(`/splits/${id}`);
+  }
+
+  public async createSplitBill(payload: any): Promise<any> {
+    return await this.request<any>('/splits', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  public async settleSplitParticipant(billId: string, participantId: string, isPaid: boolean = true): Promise<any> {
+    return await this.request<any>(`/splits/${billId}/participants/${participantId}/settle`, {
+      method: 'PATCH',
+      body: JSON.stringify({ is_paid: isPaid }),
+    });
+  }
+
+  public async deleteSplitBill(billId: string): Promise<void> {
+    return await this.request<void>(`/splits/${billId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Shared Expense Groups (Flatmates / Room Expenses)
+  public async getGroups(): Promise<any[]> {
+    const res = await this.request<any[]>('/groups');
+    return res || [];
+  }
+
+  public async getGroup(id: string): Promise<any> {
+    return await this.request<any>(`/groups/${id}`);
+  }
+
+  public async createGroup(payload: any): Promise<any> {
+    return await this.request<any>('/groups', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  public async joinGroup(inviteCode: string): Promise<any> {
+    return await this.request<any>('/groups/join', {
+      method: 'POST',
+      body: JSON.stringify({ invite_code: inviteCode }),
+    });
+  }
+
+  public async addGroupExpense(groupId: string, payload: any): Promise<any> {
+    return await this.request<any>(`/groups/${groupId}/expenses`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  public async recordGroupSettlement(groupId: string, payload: any): Promise<any> {
+    return await this.request<any>(`/groups/${groupId}/settle`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  public async deleteGroup(groupId: string): Promise<void> {
+    return await this.request<void>(`/groups/${groupId}`, {
+      method: 'DELETE',
+    });
+  }
+
   public hasValidToken(): boolean {
     return !!this.tokens?.accessToken;
   }
@@ -379,7 +458,7 @@ class ApiClient {
     const method = options.method || 'GET';
 
     if (__DEV__) {
-      console.log(`📡 [API ${method}] ${url}`, options.body ? JSON.parse(options.body as string) : '');
+      console.log(`[API ${method}] ${url}`, options.body ? JSON.parse(options.body as string) : '');
     }
 
     let response = await fetch(url, {
@@ -406,7 +485,7 @@ class ApiClient {
 
     if (response.status === 204) {
       if (__DEV__) {
-        console.log(`📥 [API Response 204 No Content] ${url}`);
+        console.log(`[API Response 204 No Content] ${url}`);
       }
       return null as unknown as T;
     }
@@ -415,9 +494,9 @@ class ApiClient {
 
     if (__DEV__) {
       if (response.ok) {
-        console.log(`📥 [API Response ${response.status}] ${url}`, data);
+        console.log(`[API Response ${response.status}] ${url}`, data);
       } else {
-        console.warn(`❌ [API Error ${response.status}] ${url}`, data);
+        console.warn(`[API Error ${response.status}] ${url}`, data);
       }
     }
 

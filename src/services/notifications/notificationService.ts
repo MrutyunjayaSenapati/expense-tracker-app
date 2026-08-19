@@ -119,8 +119,8 @@ class NotificationService {
       const identifier = await Notifications.scheduleNotificationAsync({
         identifier: DAILY_REMINDER_ID,
         content: {
-          title: 'Track Today’s Expenses 💰',
-          body: 'Take 30 seconds to log today’s spending and keep your streak alive! 🔥',
+          title: 'Track Today’s Expenses',
+          body: 'Take 30 seconds to log today’s spending and keep your streak alive.',
           color: '#4F46E5',
           data: { screen: '/(tabs)/add' },
           categoryIdentifier: 'reminders',
@@ -167,8 +167,8 @@ class NotificationService {
 
       const isOver = params.percentage >= 100;
       const title = isOver
-        ? `🚨 Over Budget: ${params.categoryName}`
-        : `⚠️ Budget Alert: ${params.categoryName}`;
+        ? `Over Budget: ${params.categoryName}`
+        : `Budget Alert: ${params.categoryName}`;
 
       const body = isOver
         ? `You've spent ₹${params.spent.toLocaleString('en-IN')} of ₹${params.limit.toLocaleString('en-IN')} limit (${params.percentage}%).`
@@ -201,7 +201,7 @@ class NotificationService {
 
       await Notifications.scheduleNotificationAsync({
         content: {
-          title: '🔔 Notifications Working!',
+          title: 'Notifications Working',
           body: 'Expense Tracker notifications are active, scheduled, and working smoothly.',
           color: '#4F46E5',
           data: { test: true },

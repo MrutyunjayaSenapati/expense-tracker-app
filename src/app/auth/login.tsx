@@ -77,7 +77,7 @@ export default function AuthScreen() {
         `&prompt=select_account`;
 
       if (__DEV__) {
-        console.log('🔗 [Google Sign-In] redirect_uri sent to Google:', googleRedirectUri);
+        console.log('[Google Sign-In] redirect_uri sent to Google:', googleRedirectUri);
       }
 
       // 4. Open in-app browser and listen for return to appRedirectUrl

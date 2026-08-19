@@ -44,18 +44,18 @@ export interface TransactionFormProps {
 }
 
 const EXPENSE_PRESETS = [
-  { label: '☕ Coffee', amount: 5, categoryKeyword: 'Food', merchant: 'Coffee' },
-  { label: '🥪 Lunch', amount: 15, categoryKeyword: 'Food', merchant: 'Lunch' },
-  { label: '⛽ Fuel', amount: 40, categoryKeyword: 'Transport', merchant: 'Fuel' },
-  { label: '🛒 Grocery', amount: 50, categoryKeyword: 'Groceries', merchant: 'Groceries' },
-  { label: '🎬 Movie', amount: 20, categoryKeyword: 'Entertainment', merchant: 'Cinema' },
+  { label: 'Coffee', icon: 'cafe-outline', amount: 5, categoryKeyword: 'Food', merchant: 'Coffee' },
+  { label: 'Lunch', icon: 'restaurant-outline', amount: 15, categoryKeyword: 'Food', merchant: 'Lunch' },
+  { label: 'Fuel', icon: 'car-outline', amount: 40, categoryKeyword: 'Transport', merchant: 'Fuel' },
+  { label: 'Grocery', icon: 'cart-outline', amount: 50, categoryKeyword: 'Groceries', merchant: 'Groceries' },
+  { label: 'Movie', icon: 'film-outline', amount: 20, categoryKeyword: 'Entertainment', merchant: 'Cinema' },
 ];
 
 const INCOME_PRESETS = [
-  { label: '💼 Salary', amount: 3000, categoryKeyword: 'Salary', merchant: 'Salary' },
-  { label: '💻 Freelance', amount: 250, categoryKeyword: 'Freelance', merchant: 'Freelance' },
-  { label: '🎁 Gift', amount: 100, categoryKeyword: 'Gift', merchant: 'Gift' },
-  { label: '📈 Dividend', amount: 50, categoryKeyword: 'Investment', merchant: 'Dividend' },
+  { label: 'Salary', icon: 'briefcase-outline', amount: 3000, categoryKeyword: 'Salary', merchant: 'Salary' },
+  { label: 'Freelance', icon: 'laptop-outline', amount: 250, categoryKeyword: 'Freelance', merchant: 'Freelance' },
+  { label: 'Gift', icon: 'gift-outline', amount: 100, categoryKeyword: 'Gift', merchant: 'Gift' },
+  { label: 'Dividend', icon: 'trending-up-outline', amount: 50, categoryKeyword: 'Investment', merchant: 'Dividend' },
 ];
 
 export const TransactionForm: React.FC<TransactionFormProps> = ({
@@ -259,6 +259,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
                     { backgroundColor: colors.surface, borderColor: colors.border },
                   ]}
                 >
+                  <Ionicons name={p.icon as any} size={14} color={colors.primary} style={{ marginRight: 5 }} />
                   <Text variant="caption" weight="bold" color="primary">
                     {p.label}
                   </Text>
@@ -465,7 +466,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
               onPress={handleSubmit(handleFormSubmit)}
               loading={isSubmitting}
               success={isSavedSuccess}
-              successLabel={mode === 'create' ? '✓ Added!' : '✓ Changes Saved!'}
+              successLabel={mode === 'create' ? 'Saved!' : 'Changes Saved!'}
               fullWidth
             >
               {mode === 'create'

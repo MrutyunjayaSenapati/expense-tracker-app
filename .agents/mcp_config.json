@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "spectr": {
+      "command": "uvx",
+      "args": ["spectr-mcp"]
+    }
+  }
+}

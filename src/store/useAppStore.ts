@@ -15,6 +15,15 @@ interface ToastState {
   type: 'success' | 'error' | 'info';
 }
 
+export interface SavingsVault {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  targetAmount: number;
+  currentAmount: number;
+}
+
 interface AppState {
   // Theme Mode (Persisted)
   themeMode: ThemeMode;
@@ -23,6 +32,12 @@ interface AppState {
   // User Preferences (Persisted)
   currency: CurrencyCode;
   setCurrency: (currency: CurrencyCode) => void;
+
+  // Savings Vaults & Pockets (Persisted)
+  vaults: SavingsVault[];
+  addVault: (vault: Omit<SavingsVault, 'id' | 'currentAmount'>) => void;
+  depositToVault: (vaultId: string, amount: number) => void;
+  deleteVault: (vaultId: string) => void;
 
   // Active Transaction Filters & Sort
   filters: TransactionFilters;
@@ -97,6 +112,31 @@ export const useAppStore = create<AppState>()(
 
       currency: 'INR',
       setCurrency: currency => set({ currency }),
+
+      // Savings Vaults & Pockets (Default empty - user created only)
+      vaults: [],
+      addVault: vaultData => {
+        const newVault: SavingsVault = {
+          ...vaultData,
+          id: `vault_${Date.now()}`,
+          currentAmount: 0,
+        };
+        set(state => ({ vaults: [...state.vaults, newVault] }));
+      },
+      depositToVault: (vaultId, amount) => {
+        set(state => ({
+          vaults: state.vaults.map(v =>
+            v.id === vaultId
+              ? { ...v, currentAmount: Math.min(v.targetAmount, v.currentAmount + amount) }
+              : v
+          ),
+        }));
+      },
+      deleteVault: vaultId => {
+        set(state => ({
+          vaults: state.vaults.filter(v => v.id !== vaultId),
+        }));
+      },
 
       filters: { type: 'all' },
       sort: 'date_desc',
@@ -187,6 +227,7 @@ export const useAppStore = create<AppState>()(
       partialize: state => ({
         themeMode: state.themeMode,
         currency: state.currency,
+        vaults: state.vaults,
         notificationsEnabled: state.notificationsEnabled,
         dailyReminderHour: state.dailyReminderHour,
         dailyReminderMinute: state.dailyReminderMinute,

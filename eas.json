@@ -11,25 +11,30 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://expense-tracker-backend-9bdd.onrender.com"
+        "EXPO_PUBLIC_API_URL": "https://expense-tracker-backend-9bdd.onrender.com",
+        "EXPO_PUBLIC_GOOGLE_CLIENT_ID": "1034897317741-hacdelsguobptpkjmp3fujjk2k2guhfu.apps.googleusercontent.com"
       }
     },
     "preview": {
       "distribution": "internal",
+      "channel": "preview",
       "android": {
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://expense-tracker-backend-9bdd.onrender.com"
+        "EXPO_PUBLIC_API_URL": "https://expense-tracker-backend-9bdd.onrender.com",
+        "EXPO_PUBLIC_GOOGLE_CLIENT_ID": "1034897317741-hacdelsguobptpkjmp3fujjk2k2guhfu.apps.googleusercontent.com"
       }
     },
     "production": {
       "autoIncrement": true,
+      "channel": "production",
       "android": {
         "buildType": "app-bundle"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://expense-tracker-backend-9bdd.onrender.com"
+        "EXPO_PUBLIC_API_URL": "https://expense-tracker-backend-9bdd.onrender.com",
+        "EXPO_PUBLIC_GOOGLE_CLIENT_ID": "1034897317741-hacdelsguobptpkjmp3fujjk2k2guhfu.apps.googleusercontent.com"
       }
     }
   },

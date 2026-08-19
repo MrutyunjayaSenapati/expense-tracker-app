@@ -47,7 +47,7 @@ export default function SettingsScreen() {
     if (val && !success) {
       showToast('Biometrics not available or authentication cancelled', 'info');
     } else if (val) {
-      showToast('Biometric App Lock enabled 🔒', 'success');
+      showToast('Biometric App Lock enabled', 'success');
     } else {
       showToast('Biometric App Lock disabled', 'info');
     }
@@ -77,7 +77,7 @@ export default function SettingsScreen() {
     const sent = await notificationService.sendTestNotification();
     setIsSendingTest(false);
     if (sent) {
-      showToast('Sample notification sent! Check your notification tray 🔔', 'success');
+      showToast('Sample notification sent. Check your notification tray.', 'success');
     } else {
       showToast('Could not send notification. Please check permissions.', 'error');
     }
@@ -387,6 +387,52 @@ export default function SettingsScreen() {
             <Text variant="bodyLarge" weight="semibold">
               Expense & Income Categories
             </Text>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={colors.textTertiary} />
+        </TouchableOpacity>
+
+        <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+        <TouchableOpacity
+          onPress={() => router.push('/splits' as any)}
+          activeOpacity={0.7}
+          style={styles.menuItem}
+        >
+          <View style={styles.menuLeft}>
+            <View style={[styles.menuIcon, { backgroundColor: colors.primaryLight }]}>
+              <Ionicons name="receipt-outline" size={20} color={colors.primary} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text variant="bodyLarge" weight="semibold">
+                Split Individual Bills
+              </Text>
+              <Text variant="caption" color="secondary">
+                1-tap UPI requests and split receipts
+              </Text>
+            </View>
+          </View>
+          <Ionicons name="chevron-forward" size={18} color={colors.textTertiary} />
+        </TouchableOpacity>
+
+        <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+        <TouchableOpacity
+          onPress={() => router.push('/groups' as any)}
+          activeOpacity={0.7}
+          style={styles.menuItem}
+        >
+          <View style={styles.menuLeft}>
+            <View style={[styles.menuIcon, { backgroundColor: colors.primaryLight }]}>
+              <Ionicons name="people-outline" size={20} color={colors.primary} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text variant="bodyLarge" weight="semibold">
+                Room & Flatmate Groups
+              </Text>
+              <Text variant="caption" color="secondary">
+                Continuous shared ledger with simplified settlements
+              </Text>
+            </View>
           </View>
           <Ionicons name="chevron-forward" size={18} color={colors.textTertiary} />
         </TouchableOpacity>

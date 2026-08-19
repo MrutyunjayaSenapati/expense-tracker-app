@@ -19,13 +19,61 @@ export interface RevolutSpendVelocityBarProps {
 
 export const RevolutSpendVelocityBar: React.FC<RevolutSpendVelocityBarProps> = ({
   totalSpentThisMonth,
-  totalMonthlyBudget = 45000,
+  totalMonthlyBudget = 0,
 }) => {
   const router = useRouter();
   const { colors } = useTheme();
   const haptics = useHaptics();
   const { data: user } = useUser();
   const currencyCode = (user?.currency || 'INR') as CurrencyCode;
+
+  // If user has not set a monthly budget yet, show a clean prompt instead of mock data
+  if (!totalMonthlyBudget || totalMonthlyBudget <= 0) {
+    return (
+      <TouchableOpacity
+        onPress={() => {
+          haptics.selection();
+          router.push('/budgets/create');
+        }}
+        activeOpacity={0.8}
+        style={styles.container}
+      >
+        <Card
+          elevation="subtle"
+          style={[
+            styles.card,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+            },
+          ]}
+        >
+          <View style={styles.topRow}>
+            <View style={styles.leftInfo}>
+              <View style={[styles.iconDot, { backgroundColor: colors.primaryLight }]}>
+                <Ionicons name="flash-outline" size={14} color={colors.primary} />
+              </View>
+              <View>
+                <Text variant="caption" weight="bold" color="primary">
+                  Set a Monthly Budget
+                </Text>
+                <Text variant="caption" color="secondary" style={{ fontSize: 11, marginTop: 1 }}>
+                  Calculate your safe daily spending limit automatically
+                </Text>
+              </View>
+            </View>
+
+            <View style={styles.rightBadge}>
+              <Text variant="caption" weight="bold" color="brand">
+                + Set
+              </Text>
+              <Ionicons name="chevron-forward" size={14} color={colors.primary} />
+            </View>
+          </View>
+        </Card>
+      </TouchableOpacity>
+    );
+  }
 
   // Calculate days remaining in the current month
   const now = new Date();

@@ -110,7 +110,7 @@ export default function HomeScreen() {
           <Animated.View entering={FadeInDown.duration(400).delay(120)}>
             <RevolutSpendVelocityBar
               totalSpentThisMonth={dashboard.totalExpense}
-              totalMonthlyBudget={dashboard.monthlyBudget || 50000}
+              totalMonthlyBudget={dashboard.monthlyBudget || 0}
             />
           </Animated.View>
 

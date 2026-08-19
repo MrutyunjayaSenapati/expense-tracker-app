@@ -35,7 +35,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           {greeting}
         </Text>
         <Text variant="headingL" weight="bold" numberOfLines={1} style={styles.nameText}>
-          {`${userName} 👋`}
+          {userName}
         </Text>
         <Text variant="caption" color="secondary" style={styles.dateText}>
           {currentMonth}

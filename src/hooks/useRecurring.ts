@@ -73,7 +73,7 @@ export function useRecurring() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['recurring-transactions'] });
       queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-      showToast('Subscription added successfully! 🔄', 'success');
+      showToast('Subscription added successfully', 'success');
     },
     onError: (err: any) => {
       showToast(err?.message || 'Failed to create subscription', 'error');
