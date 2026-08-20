@@ -48,7 +48,9 @@ export const ContactPickerModal: React.FC<ContactPickerModalProps> = ({
     if (!visible) {
       return;
     }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedIds(new Set());
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSearchQuery('');
 
     // Load contacts strictly from native device

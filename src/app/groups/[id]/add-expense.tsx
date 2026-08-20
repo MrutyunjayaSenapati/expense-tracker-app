@@ -47,10 +47,12 @@ export default function AddGroupExpenseScreen() {
   React.useEffect(() => {
     if (group && group.members.length > 0 && !payerMemberId) {
       const userMember = group.members.find(m => m.userId === user?.id) || group.members[0];
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPayerMemberId(userMember.id);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedSplitMemberIds(new Set(group.members.map(m => m.id)));
     }
-  }, [group, user]);
+  }, [group, user, payerMemberId]);
 
   const amount = parseFloat(amountStr) || 0;
   const splitCount = selectedSplitMemberIds.size;
