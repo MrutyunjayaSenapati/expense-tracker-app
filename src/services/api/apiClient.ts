@@ -5,16 +5,12 @@ import * as SecureStore from 'expo-secure-store';
 function resolveBaseUrl(): string {
   let envUrl = process.env.EXPO_PUBLIC_API_URL?.trim();
 
-  if (envUrl) {
-    envUrl = envUrl.replace(/\/+$/, '');
-    if (!envUrl.endsWith('/api/v1')) {
-      envUrl = `${envUrl}/api/v1`;
-    }
-    return envUrl;
-  }
-
-  // Production standalone build fallback
+  // In production builds, ALWAYS force live HTTPS backend URL
   if (!__DEV__) {
+    if (envUrl && envUrl.startsWith('https://') && !envUrl.includes('7w8s')) {
+      envUrl = envUrl.replace(/\/+$/, '');
+      return envUrl.endsWith('/api/v1') ? envUrl : `${envUrl}/api/v1`;
+    }
     return 'https://expense-tracker-backend-9bdd.onrender.com/api/v1';
   }
 
