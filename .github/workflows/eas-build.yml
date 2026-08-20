@@ -65,17 +65,27 @@ jobs:
       - name: ⚙️ Generate Native Android Code
         run: npx expo prebuild --platform android --no-install
 
+      - name: 📦 Bundle Offline JavaScript Assets
+        run: |
+          mkdir -p android/app/src/main/assets
+          npx react-native bundle \
+            --platform android \
+            --dev false \
+            --entry-file node_modules/expo-router/entry.js \
+            --bundle-output android/app/src/main/assets/index.android.bundle \
+            --assets-dest android/app/src/main/res
+
       - name: 🔨 Make Gradle Executable
         run: chmod +x android/gradlew
 
-      - name: 📦 Compile Standalone Android APK
+      - name: 📦 Compile Standalone Production Android APK
         run: |
           cd android
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleRelease --no-daemon
 
-      - name: 📤 Upload Downloadable APK Artifact
+      - name: 📤 Upload Downloadable Standalone APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ExpenseTracker-Android-APK
-          path: android/app/build/outputs/apk/debug/*.apk
+          path: android/app/build/outputs/apk/release/*.apk
           retention-days: 30
