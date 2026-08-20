@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { View, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Linking from 'expo-linking';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { apiClient } from '../services/api/apiClient';
 import { Text } from '../components/ui/Text';
 import { colors } from '../theme/colors';
@@ -15,8 +15,19 @@ export default function OAuthCallbackScreen() {
   useEffect(() => {
     async function handleOAuthReturn() {
       try {
-        let accessToken = (params.access_token as string) || (params.accessToken as string);
-        let refreshToken = (params.refresh_token as string) || (params.refreshToken as string);
+        let accessToken: string | undefined =
+          typeof params.access_token === 'string'
+            ? params.access_token
+            : typeof params.accessToken === 'string'
+            ? params.accessToken
+            : undefined;
+
+        let refreshToken: string | undefined =
+          typeof params.refresh_token === 'string'
+            ? params.refresh_token
+            : typeof params.refreshToken === 'string'
+            ? params.refreshToken
+            : undefined;
 
         // Parse hash fragment if available via deep link URL
         const initialUrl = await Linking.getInitialURL();
@@ -44,9 +55,9 @@ export default function OAuthCallbackScreen() {
   }, []);
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background.dark, justifyContent: 'center', alignItems: 'center' }}>
-      <ActivityIndicator size="large" color={colors.accent.primary} />
-      <Text style={{ color: colors.text.secondary, marginTop: 16, fontSize: 14 }}>
+    <View style={{ flex: 1, backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }}>
+      <ActivityIndicator size="large" color={colors.primary} />
+      <Text style={{ color: colors.textSecondary, marginTop: 16, fontSize: 14 }}>
         Completing Google Sign-In...
       </Text>
     </View>
