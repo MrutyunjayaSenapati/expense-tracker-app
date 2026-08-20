@@ -15,7 +15,7 @@ function resolveBaseUrl(): string {
 
   // Production standalone build fallback
   if (!__DEV__) {
-    return 'https://expense-tracker-backend-7w8s.onrender.com/api/v1';
+    return 'https://expense-tracker-backend-9bdd.onrender.com/api/v1';
   }
 
   // 1. If running on Web, localhost:8000 works directly

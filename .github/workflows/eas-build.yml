@@ -72,7 +72,7 @@ jobs:
 
       - name: 📦 Compile Standalone Production Android APK
         env:
-          EXPO_PUBLIC_API_URL: "https://expense-tracker-backend-7w8s.onrender.com/api/v1"
+          EXPO_PUBLIC_API_URL: "https://expense-tracker-backend-9bdd.onrender.com/api/v1"
           GRADLE_OPTS: "-Dorg.gradle.jvmargs='-Xmx4096m -XX:MaxMetaspaceSize=1024m'"
         run: |
           cd android
