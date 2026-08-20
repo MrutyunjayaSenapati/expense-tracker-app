@@ -52,7 +52,7 @@ function ProtectedNavigation() {
   useEffect(() => {
     if (!isInitialized) return;
 
-    const inAuthGroup = segments[0] === 'auth' || segments[0] === 'onboarding';
+    const inAuthGroup = segments[0] === 'auth' || segments[0] === 'onboarding' || (segments[0] as string) === 'oauth';
 
     if (!isAuthenticated && !inAuthGroup) {
       // 1. Block access: Unauthenticated users are sent immediately to Login
@@ -80,6 +80,7 @@ function ProtectedNavigation() {
         },
       }}
     >
+      <Stack.Screen name="oauth" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen
         name="transactions/[id]"
