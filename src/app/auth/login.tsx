@@ -7,7 +7,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeInDown, FadeInUp, LinearTransition } from 'react-native-reanimated';
 import * as WebBrowser from 'expo-web-browser';
@@ -28,6 +28,7 @@ import { Ionicons } from '@expo/vector-icons';
 WebBrowser.maybeCompleteAuthSession();
 
 export default function AuthScreen() {
+  const router = useRouter();
   const params = useLocalSearchParams();
   const { colors } = useTheme();
   const { login, register, googleLogin, checkAuth, isLoading, isGoogleLoading } = useAuth();
@@ -57,7 +58,7 @@ export default function AuthScreen() {
       // 1. Deep link URL that bounces back into the mobile app (or web origin)
       const appRedirectUrl = Platform.OS === 'web'
         ? (typeof window !== 'undefined' ? `${window.location.origin}` : 'http://localhost:8081')
-        : Linking.createURL('oauth');
+        : Linking.createURL('auth/login');
 
       // 2. Google OAuth registered callback URI
       const backendBaseUrl = apiClient.getBaseUrl();
@@ -107,6 +108,7 @@ export default function AuthScreen() {
         if (accessToken && refreshToken) {
           apiClient.setSessionTokens({ accessToken, refreshToken, expiresIn: 1800 });
           await checkAuth();
+          router.replace('/(tabs)/home');
           return;
         }
 
@@ -392,9 +394,9 @@ export default function AuthScreen() {
 
               {/* Bottom Toggle Prompt */}
               <TouchableOpacity
-                onPress={() => handleTabSwitch(activeTab === 'login' ? 'register' : 'login')}
-                activeOpacity={0.7}
                 style={styles.togglePrompt}
+                onPress={() => setActiveTab(activeTab === 'login' ? 'register' : 'login')}
+                activeOpacity={0.7}
               >
                 <Text variant="bodySmall" color="secondary">
                   {activeTab === 'login' ? "Don't have an account? " : 'Already have an account? '}
@@ -403,6 +405,14 @@ export default function AuthScreen() {
                   </Text>
                 </Text>
               </TouchableOpacity>
+
+              <View style={{ marginTop: 24, alignItems: 'center' }}>
+                <View style={{ backgroundColor: 'rgba(16, 185, 129, 0.12)', paddingHorizontal: 12, paddingVertical: 5, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(16, 185, 129, 0.3)' }}>
+                  <Text style={{ color: '#10B981', fontSize: 11, fontWeight: '700' }}>
+                    ✨ Live OTA v1.0.2 • 9bdd Backend
+                  </Text>
+                </View>
+              </View>
             </Animated.View>
           </View>
         </ScrollView>
