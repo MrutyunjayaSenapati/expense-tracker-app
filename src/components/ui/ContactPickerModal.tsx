@@ -46,10 +46,10 @@ export const ContactPickerModal: React.FC<ContactPickerModalProps> = ({
 
   useEffect(() => {
     if (!visible) {
-      setSelectedIds(new Set());
-      setSearchQuery('');
       return;
     }
+    setSelectedIds(new Set());
+    setSearchQuery('');
 
     // Load contacts strictly from native device
     (async () => {

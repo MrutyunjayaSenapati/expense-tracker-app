@@ -165,7 +165,7 @@ export default function GroupsListScreen() {
                 No Groups Yet
               </Text>
               <Text variant="caption" color="secondary" align="center" style={styles.emptySubtitle}>
-                Create a "Room Expenses" or "Flatmates" group to track continuous shared expenses and simplify settlements.
+                {`Create a "Room Expenses" or "Flatmates" group to track continuous shared expenses and simplify settlements.`}
               </Text>
               <TouchableOpacity
                 onPress={() => router.push('/groups/create' as any)}
