@@ -65,12 +65,12 @@ export default function AuthScreen() {
         ? appRedirectUrl
         : `${backendBaseUrl}/auth/google/callback`;
 
-      // 3. Construct OAuth URL with response_type=token id_token
+      // 3. Construct OAuth URL with response_type=code
       const authUrl =
         `https://accounts.google.com/o/oauth2/v2/auth?` +
         `client_id=${encodeURIComponent(googleClientId)}` +
         `&redirect_uri=${encodeURIComponent(googleRedirectUri)}` +
-        `&response_type=token%20id_token` +
+        `&response_type=code` +
         `&scope=${encodeURIComponent('openid email profile')}` +
         `&state=${encodeURIComponent(appRedirectUrl)}` +
         `&nonce=${Math.random().toString(36).substring(2)}` +
