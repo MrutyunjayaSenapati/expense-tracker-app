@@ -37,7 +37,9 @@ jobs:
       - name: 🚀 Publish Instant OTA Update
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: npx eas-cli update --channel preview --auto --non-interactive
+        run: |
+          npx eas-cli update --channel preview --auto --non-interactive
+          npx eas-cli update --channel default --auto --non-interactive
 
   build_apk:
     name: 📱 Build Android APK (Free GitHub Runner)
@@ -71,6 +73,7 @@ jobs:
       - name: 📦 Compile Standalone Production Android APK
         env:
           EXPO_PUBLIC_API_URL: "https://expense-tracker-backend-9bdd.onrender.com/api/v1"
+          EXPO_UPDATE_CHANNEL: "preview"
           GRADLE_OPTS: "-Dorg.gradle.jvmargs='-Xmx4096m -XX:MaxMetaspaceSize=1024m'"
         run: |
           cd android
