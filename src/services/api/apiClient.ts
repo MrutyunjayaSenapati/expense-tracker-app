@@ -3,15 +3,14 @@ import Constants from 'expo-constants';
 import * as SecureStore from 'expo-secure-store';
 
 function resolveBaseUrl(): string {
-  let envUrl = process.env.EXPO_PUBLIC_API_URL?.trim();
-
-  // In production builds, ALWAYS force live HTTPS backend URL
   if (!__DEV__) {
-    if (envUrl && envUrl.startsWith('https://') && !envUrl.includes('7w8s')) {
-      envUrl = envUrl.replace(/\/+$/, '');
-      return envUrl.endsWith('/api/v1') ? envUrl : `${envUrl}/api/v1`;
-    }
     return 'https://expense-tracker-backend-9bdd.onrender.com/api/v1';
+  }
+
+  let envUrl = process.env.EXPO_PUBLIC_API_URL?.trim();
+  if (envUrl) {
+    envUrl = envUrl.replace(/\/+$/, '');
+    return envUrl.endsWith('/api/v1') ? envUrl : `${envUrl}/api/v1`;
   }
 
   // 1. If running on Web, localhost:8000 works directly
