@@ -37,7 +37,9 @@ jobs:
       - name: 🚀 Publish Instant OTA Update
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: npx eas-cli update --branch preview --auto --non-interactive
+        run: |
+          npx eas-cli update --branch main --auto --non-interactive
+          npx eas-cli update --branch preview --auto --non-interactive
 
   build_apk:
     name: 📱 Build Android APK (Free GitHub Runner)
