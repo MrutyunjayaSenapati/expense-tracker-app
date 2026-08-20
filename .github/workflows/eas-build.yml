@@ -65,16 +65,6 @@ jobs:
       - name: ⚙️ Generate Native Android Code
         run: npx expo prebuild --platform android --no-install
 
-      - name: 📦 Bundle Offline JavaScript Assets
-        run: |
-          mkdir -p android/app/src/main/assets
-          npx react-native bundle \
-            --platform android \
-            --dev false \
-            --entry-file node_modules/expo-router/entry.js \
-            --bundle-output android/app/src/main/assets/index.android.bundle \
-            --assets-dest android/app/src/main/res
-
       - name: 🔨 Make Gradle Executable
         run: chmod +x android/gradlew
 
