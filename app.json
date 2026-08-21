@@ -65,7 +65,7 @@
       "url": "https://u.expo.dev/ceb77f64-f6f4-43dd-a76a-3d572fa8c61d",
       "enabled": true,
       "checkAutomatically": "ON_LOAD",
-      "fallbackToCacheTimeout": 0,
+      "fallbackToCacheTimeout": 3000,
       "requestHeaders": {
         "expo-channel-name": "preview"
       }
