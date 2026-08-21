@@ -37,15 +37,15 @@ jobs:
       - name: 🚀 Publish Instant OTA Update
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-        run: |
-          npx eas-cli update --channel preview --auto --non-interactive
-          npx eas-cli update --channel default --auto --non-interactive
+        run: npx eas-cli update --channel preview --auto --non-interactive
 
   build_apk:
     name: 📱 Build Android APK (Free GitHub Runner)
     needs: ota_update
     if: github.event.inputs.build_apk == 'true'
     runs-on: ubuntu-latest
+    env:
+      EXPO_UPDATE_CHANNEL: "preview"
     steps:
       - name: 🏗 Checkout Repository
         uses: actions/checkout@v4
