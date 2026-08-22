@@ -60,20 +60,16 @@ export default function AuthScreen() {
         ? (typeof window !== 'undefined' ? `${window.location.origin}` : 'http://localhost:8081')
         : Linking.createURL('auth/login');
 
-      // 2. Google OAuth registered callback URI
-      const backendBaseUrl = apiClient.getBaseUrl();
-      const googleRedirectUri = Platform.OS === 'web'
-        ? appRedirectUrl
-        : `${backendBaseUrl}/auth/google/callback`;
+      // 2. Direct mobile app OAuth callback URI
+      const googleRedirectUri = appRedirectUrl;
 
-      // 3. Construct OAuth URL with response_type=code
+      // 3. Construct OAuth URL with response_type=token id_token for direct token verification
       const authUrl =
         `https://accounts.google.com/o/oauth2/v2/auth?` +
         `client_id=${encodeURIComponent(googleClientId)}` +
         `&redirect_uri=${encodeURIComponent(googleRedirectUri)}` +
-        `&response_type=code` +
+        `&response_type=${encodeURIComponent('token id_token')}` +
         `&scope=${encodeURIComponent('openid email profile')}` +
-        `&state=${encodeURIComponent(appRedirectUrl)}` +
         `&nonce=${Math.random().toString(36).substring(2)}` +
         `&prompt=select_account`;
 
@@ -407,9 +403,9 @@ export default function AuthScreen() {
               </TouchableOpacity>
 
               <View style={{ marginTop: 24, alignItems: 'center' }}>
-                <View style={{ backgroundColor: 'rgba(16, 185, 129, 0.12)', paddingHorizontal: 12, paddingVertical: 5, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(16, 185, 129, 0.3)' }}>
-                  <Text style={{ color: '#10B981', fontSize: 11, fontWeight: '700' }}>
-                    ✨ Live OTA test v7 • 9bdd Backend
+                <View style={{ backgroundColor: 'rgba(99, 102, 241, 0.2)', paddingHorizontal: 14, paddingVertical: 6, borderRadius: 14, borderWidth: 1.5, borderColor: '#6366F1' }}>
+                  <Text style={{ color: '#818CF8', fontSize: 12, fontWeight: '800', letterSpacing: 0.5 }}>
+                    🚀 LIVE OTA v7.0 [UPDATED-SSO-OK] • 9bdd Backend
                   </Text>
                 </View>
               </View>
