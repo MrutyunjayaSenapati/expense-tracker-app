@@ -71,7 +71,7 @@ export default function AuthScreen() {
         `https://accounts.google.com/o/oauth2/v2/auth?` +
         `client_id=${encodeURIComponent(googleClientId)}` +
         `&redirect_uri=${encodeURIComponent(googleRedirectUri)}` +
-        `&response_type=${encodeURIComponent('token id_token')}` +
+        `&response_type=code` +
         `&scope=${encodeURIComponent('openid email profile')}` +
         `&state=${encodeURIComponent(appRedirectUrl)}` +
         `&nonce=${Math.random().toString(36).substring(2)}` +
