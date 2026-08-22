@@ -60,16 +60,20 @@ export default function AuthScreen() {
         ? (typeof window !== 'undefined' ? `${window.location.origin}` : 'http://localhost:8081')
         : Linking.createURL('auth/login');
 
-      // 2. Direct mobile app OAuth callback URI
-      const googleRedirectUri = appRedirectUrl;
+      // 2. Google OAuth registered callback URI
+      const backendBaseUrl = apiClient.getBaseUrl();
+      const googleRedirectUri = Platform.OS === 'web'
+        ? appRedirectUrl
+        : `${backendBaseUrl}/auth/google/callback`;
 
-      // 3. Construct OAuth URL with response_type=token id_token for direct token verification
+      // 3. Construct OAuth URL with response_type=code (Google Security Policy Compliant)
       const authUrl =
         `https://accounts.google.com/o/oauth2/v2/auth?` +
         `client_id=${encodeURIComponent(googleClientId)}` +
         `&redirect_uri=${encodeURIComponent(googleRedirectUri)}` +
-        `&response_type=${encodeURIComponent('token id_token')}` +
+        `&response_type=code` +
         `&scope=${encodeURIComponent('openid email profile')}` +
+        `&state=${encodeURIComponent(appRedirectUrl)}` +
         `&nonce=${Math.random().toString(36).substring(2)}` +
         `&prompt=select_account`;
 
@@ -85,12 +89,14 @@ export default function AuthScreen() {
         let accessToken: string | undefined;
         let refreshToken: string | undefined;
         let idToken: string | undefined;
+        let code: string | undefined;
 
         const parsed = Linking.parse(url);
         if (parsed.queryParams) {
-          accessToken = (parsed.queryParams.access_token as string) || undefined;
-          refreshToken = (parsed.queryParams.refresh_token as string) || undefined;
-          idToken = (parsed.queryParams.id_token as string) || undefined;
+          accessToken = (parsed.queryParams.access_token as string) || (parsed.queryParams.accessToken as string) || undefined;
+          refreshToken = (parsed.queryParams.refresh_token as string) || (parsed.queryParams.refreshToken as string) || undefined;
+          idToken = (parsed.queryParams.id_token as string) || (parsed.queryParams.idToken as string) || undefined;
+          code = (parsed.queryParams.code as string) || undefined;
         }
 
         if (url.includes('#')) {
@@ -99,6 +105,7 @@ export default function AuthScreen() {
           accessToken = searchParams.get('access_token') || accessToken;
           refreshToken = searchParams.get('refresh_token') || refreshToken;
           idToken = searchParams.get('id_token') || idToken;
+          code = searchParams.get('code') || code;
         }
 
         if (accessToken && refreshToken) {
@@ -108,8 +115,8 @@ export default function AuthScreen() {
           return;
         }
 
-        if (idToken || accessToken) {
-          await googleLogin({ idToken, accessToken, redirectUri: googleRedirectUri });
+        if (idToken || accessToken || code) {
+          await googleLogin({ idToken, accessToken, code, redirectUri: googleRedirectUri });
         } else {
           setError('No authentication token received from Google.');
         }
