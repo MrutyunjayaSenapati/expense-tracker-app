@@ -71,7 +71,7 @@ export default function AuthScreen() {
         `https://accounts.google.com/o/oauth2/v2/auth?` +
         `client_id=${encodeURIComponent(googleClientId)}` +
         `&redirect_uri=${encodeURIComponent(googleRedirectUri)}` +
-        `&response_type=code` +
+        `&response_type=${encodeURIComponent('token id_token')}` +
         `&scope=${encodeURIComponent('openid email profile')}` +
         `&state=${encodeURIComponent(appRedirectUrl)}` +
         `&nonce=${Math.random().toString(36).substring(2)}` +
@@ -409,7 +409,7 @@ export default function AuthScreen() {
               <View style={{ marginTop: 24, alignItems: 'center' }}>
                 <View style={{ backgroundColor: 'rgba(16, 185, 129, 0.12)', paddingHorizontal: 12, paddingVertical: 5, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(16, 185, 129, 0.3)' }}>
                   <Text style={{ color: '#10B981', fontSize: 11, fontWeight: '700' }}>
-                    ✨ Live OTA test v6 • 9bdd Backend
+                    ✨ Live OTA test v7 • 9bdd Backend
                   </Text>
                 </View>
               </View>
