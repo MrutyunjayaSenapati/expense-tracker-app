@@ -409,7 +409,7 @@ export default function AuthScreen() {
               <View style={{ marginTop: 24, alignItems: 'center' }}>
                 <View style={{ backgroundColor: 'rgba(16, 185, 129, 0.12)', paddingHorizontal: 12, paddingVertical: 5, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(16, 185, 129, 0.3)' }}>
                   <Text style={{ color: '#10B981', fontSize: 11, fontWeight: '700' }}>
-                    ✨ Live OTA test v4 • 9bdd Backend
+                    ✨ Live OTA test v5 • 9bdd Backend
                   </Text>
                 </View>
               </View>

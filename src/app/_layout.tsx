@@ -25,6 +25,7 @@ import { BiometricLockOverlay } from '../components/ui/BiometricLockOverlay';
 import { useAuthStore } from '../store/useAuthStore';
 import { useAppStore } from '../store/useAppStore';
 import { useTheme } from '../hooks/useTheme';
+import * as Updates from 'expo-updates';
 import { notificationService } from '../services/notifications/notificationService';
 
 const queryClient = new QueryClient({
@@ -47,6 +48,20 @@ function ProtectedNavigation() {
   useEffect(() => {
     initializeAuth();
     notificationService.init();
+
+    async function checkAndApplyAutoUpdate() {
+      try {
+        if (__DEV__) return;
+        const update = await Updates.checkForUpdateAsync();
+        if (update.isAvailable) {
+          await Updates.fetchUpdateAsync();
+          await Updates.reloadAsync();
+        }
+      } catch (error) {
+        // Silent catch for offline mode
+      }
+    }
+    checkAndApplyAutoUpdate();
   }, [initializeAuth]);
 
   useEffect(() => {
